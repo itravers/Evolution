@@ -2,6 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,7 +16,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
 
-public class MyGdxGame extends ApplicationAdapter {
+public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	World physicsWorld;
 
 	Box2DDebugRenderer debugRenderer;
@@ -24,6 +26,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	Texture img;
 
 	ArrayList<Creature> creatures;
+	ArrayList<Food> foods;
 
 	final float PIXELS_TO_METERS = 100f;
 	
@@ -34,18 +37,27 @@ public class MyGdxGame extends ApplicationAdapter {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
+		Gdx.input.setInputProcessor(this);
 		createCreatures();
+		createFood();
+	}
+
+	private void createFood(){
+		foods = new ArrayList<Food>();
+		Vector2 position = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
+		Vector2 size = new Vector2(5 , 10);
+		Food f = new Food(this, physicsWorld, position, size);
+		System.out.println("FPOS: " + (int)f.getPos().x + ":" + f.getPos().y);
+		foods.add(f);
 	}
 
 	private void createCreatures(){
 		creatures = new ArrayList<Creature>();
-
-
 		//create a single creature for testing
 		Vector2 position = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
 		Vector2 size = new Vector2(5 , 10);
 		Creature c = new Creature(this, physicsWorld, position,  size);
-		System.out.println("POS: " + (int)c.getPos().x + ":" + c.getPos().y);
+		System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 		creatures.add(c);
 	}
 
@@ -84,5 +96,78 @@ public class MyGdxGame extends ApplicationAdapter {
 		debugRenderer.dispose();
 
 		img.dispose();
+	}
+
+	@Override
+	public boolean keyDown(int keycode) {
+		//System.out.println("keydown");
+		if(keycode == Input.Keys.W){
+			if(!creatures.isEmpty()){
+				//System.out.println("W Pressed");
+				creatures.get(0).setThrustForwardPressed(true);
+			}
+		}else if(keycode == Input.Keys.A){
+			if(!creatures.isEmpty()){
+				//System.out.println("W Pressed");
+				creatures.get(0).setRotateLeftPressed(true);
+			}
+		}else if(keycode == Input.Keys.D){
+			if(!creatures.isEmpty()){
+				//System.out.println("W Pressed");
+				creatures.get(0).setRotateRightPressed(true);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		if(keycode == Input.Keys.W){
+			if(!creatures.isEmpty()){
+				//System.out.println("W Released");
+				creatures.get(0).setThrustForwardPressed(false);
+			}
+		}else if(keycode == Input.Keys.A){
+			if(!creatures.isEmpty()){
+				//System.out.println("W Pressed");
+				creatures.get(0).setRotateLeftPressed(false);
+			}
+		}else if(keycode == Input.Keys.D){
+			if(!creatures.isEmpty()){
+				//System.out.println("W Pressed");
+				creatures.get(0).setRotateRightPressed(false);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		return false;
 	}
 }

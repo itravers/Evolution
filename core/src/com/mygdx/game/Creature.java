@@ -17,18 +17,18 @@ public class Creature {
     private FixtureDef fixtureDef;
     private Fixture fixture;
 
-    private float linearDamping = .4f;
-    private float angularDamping = .5f;
+    private float linearDamping = .8f;
+    private float angularDamping = 1f;
     private float density = 1.25f;
     private float friction = .5f;
     private Vector2 size;
     private float movePower = .0005f;
-    private float rotationPower = .00001f;
+    private float rotationPower = .0000015f;
 
 
 
     //Inputs
-    private boolean rotateRightPressed = true;
+    private boolean rotateRightPressed = false;
     private boolean rotateLeftPressed = false;
     private boolean thrustForwardPressed = false;
 
