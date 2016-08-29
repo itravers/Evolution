@@ -42,8 +42,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 
 		//create a single creature for testing
-		Vector2 position = new Vector2(17, 12);
-		Vector2 size = new Vector2(50 , 50);
+		Vector2 position = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
+		Vector2 size = new Vector2(5 , 10);
 		Creature c = new Creature(this, physicsWorld, position,  size);
 		System.out.println("POS: " + (int)c.getPos().x + ":" + c.getPos().y);
 		creatures.add(c);
