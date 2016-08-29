@@ -7,6 +7,8 @@ import com.badlogic.gdx.physics.box2d.*;
  * Created by Isaac Assegai on 8/29/16.
  */
 public class Creature {
+    MyGdxGame parent;
+
     //Physics Fields
     private BodyDef bodyDef;
     private Body body;
@@ -22,12 +24,13 @@ public class Creature {
     //Collision Category
     public static final short CATEGORY = -1;
 
-    public Creature(World physicsWorld, Vector2 position, Vector2 size){
+    public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
+        this.parent = parent;
         setupPhysics(physicsWorld, position, size);
 
     }
 
-    private void setupPhysics((World physicsWorld, Vector2 position, Vector2 size){
+    private void setupPhysics(World physicsWorld, Vector2 position, Vector2 size){
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position);
@@ -37,7 +40,7 @@ public class Creature {
         body.setAngularDamping(angularDamping);
 
         shape = new PolygonShape();
-        shape.setAsBox(size.x /2, size.y/2);
+        shape.setAsBox((size.x /2) / parent.PIXELS_TO_METERS, (size.y/2)/parent.PIXELS_TO_METERS);
 
         fixtureDef = new FixtureDef();
         fixtureDef.filter.groupIndex = CATEGORY;
@@ -48,5 +51,9 @@ public class Creature {
         fixture = body.createFixture(fixtureDef);
         body.setUserData(this);
         shape.dispose();
+    }
+
+    public void render(){
+
     }
 }
