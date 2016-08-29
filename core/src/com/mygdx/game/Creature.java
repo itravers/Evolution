@@ -23,11 +23,12 @@ public class Creature {
     private float friction = .5f;
     private Vector2 size;
     private float movePower = .0005f;
+    private float rotationPower = .00001f;
 
 
 
     //Inputs
-    private boolean rotateRightPressed = false;
+    private boolean rotateRightPressed = true;
     private boolean rotateLeftPressed = false;
     private boolean thrustForwardPressed = false;
 
@@ -35,6 +36,7 @@ public class Creature {
     //Collision Category
     public static final short CATEGORY = -1;
     private float MAX_SPEED = .5f;
+    private float MAX_ROTATION_SPEED = 10f;
 
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
         this.parent = parent;
@@ -74,15 +76,28 @@ public class Creature {
     public void update(){
         //get input and apply inpulses.
         if(isThrustForwardPressed()){
-            System.out.println("currentSpeed: " + getCurrentSpeed());
+            //System.out.println("currentSpeed: " + getCurrentSpeed());
             if(getCurrentSpeed() < MAX_SPEED){
-
                 Vector2 impulse = new Vector2(-(float)Math.sin(body.getAngle()), (float)Math.cos(body.getAngle())).scl(movePower);
                 body.applyLinearImpulse(impulse, body.getPosition(),true);
 
             }
         }
+
+        if(isRotateLeftPressed()){
+            if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
+                body.applyAngularImpulse(+rotationPower, true);
+            }
+        }
+
+        if(isRotateRightPressed()){
+            if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
+                body.applyAngularImpulse(-rotationPower, true);
+            }
+        }
     }
+
+
 
     private float getCurrentSpeed(){
         return body.getLinearVelocity().len2();
