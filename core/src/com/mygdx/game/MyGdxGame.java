@@ -44,7 +44,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
-		createCreatures();
+		createCreatures(2);
 		createFood(2);
 	}
 
@@ -60,14 +60,18 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
-	private void createCreatures(){
+	private void createCreatures(int num){
 		creatures = new ArrayList<Creature>();
 		//create a single creature for testing
-		Vector2 position = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
-		Vector2 size = new Vector2(5 , 10);
-		Creature c = new Creature(this, physicsWorld, position,  size);
-		System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
-		creatures.add(c);
+
+		for(int i = 0; i < num; i++) {
+			Vector2 size = new Vector2(5 , 10);
+			Vector2 position = new Vector2(getRandomPositionFromSize(size));
+			Creature c = new Creature(this, physicsWorld, position,  size);
+			//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
+			creatures.add(c);
+		}
+
 	}
 
 	@Override

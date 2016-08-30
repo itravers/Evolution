@@ -66,7 +66,7 @@ public class Creature {
                       // (size.y / 2) / parent.PIXELS_TO_METERS);
 
         fixtureDef = new FixtureDef();
-        fixtureDef.filter.groupIndex = CATEGORY;
+        //fixtureDef.filter.groupIndex = CATEGORY;
         fixtureDef.shape = shape;
         fixtureDef.density = density;
         fixtureDef.friction = friction;
