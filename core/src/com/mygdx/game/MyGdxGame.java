@@ -47,7 +47,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
 		createFood(2);
-		createCreatures(20);
+		createCreatures(2);
 
 	}
 

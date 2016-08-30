@@ -82,8 +82,8 @@ public class NeuralNet {
             //for each neuron in layer
             for(int j = 0; j < listLayers.get(i).numNeurons; j++){
                 //for each weight
-                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).numInputs; k++){
-                    weights.add(listLayers.get(i).listNeurons.get(j).listWeights.get(k));
+                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).getNumInputs(); k++){
+                    weights.add(listLayers.get(i).listNeurons.get(j).getWeight(k));
                 }
             }
         }
@@ -102,7 +102,7 @@ public class NeuralNet {
             //for each neuron
             for(int j = 0; j < listLayers.get(i).numNeurons; j++){
                 //for each weight
-                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).numInputs; k++){
+                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).getNumInputs(); k++){
                     weights++;
                 }
             }
@@ -113,9 +113,9 @@ public class NeuralNet {
 
     /**
      * Replaces the weights with new ones.
-     * @param w
+     * @param newListWeights
      */
-    public void putWeights(ArrayList<Double>w){
+    public void putWeights(ArrayList<Double>newListWeights){
         int weightCount = 0;
 
         //for each layer
@@ -123,8 +123,9 @@ public class NeuralNet {
             //for each neuron
             for(int j = 0; j < listLayers.get(i).numNeurons; j++){
                 //for each weight
-                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).numInputs; k++){
-                    listLayers.get(i).listNeurons.get(j).listWeights = w;
+                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).getNumInputs(); k++){
+                   // listLayers.get(i).listNeurons.get(j).listWeights = newListWeights;
+                    listLayers.get(i).listNeurons.get(j).replaceWeights(newListWeights);
 
                 }
             }
@@ -132,7 +133,8 @@ public class NeuralNet {
     }
 
     public void debugNet(){
-        System.out.print(" [ ");
+        System.out.println(owner.toString() + "--------------------------------------------------------------------");
+        System.out.print(" INPUTS [ ");
         System.out.format(" A:%.2f B:%.2f C:%.2f D:%.2f ", listInputs.get(0), listInputs.get(1), listInputs.get(2), listInputs.get(3));
         System.out.format(" E:%.2f F:%.2f G:%.2f H:%.2f ", listInputs.get(4), listInputs.get(5), listInputs.get(6), listInputs.get(7));
         System.out.format(" I:%.2f J:%.2f K:%.2f L:%.2f ", listInputs.get(8), listInputs.get(9), listInputs.get(10), listInputs.get(11));
@@ -142,12 +144,18 @@ public class NeuralNet {
         //Loop through each layers
         for(int i = 0; i < listLayers.size(); i++){
             NeuronLayer l = listLayers.get(i);
-
+            System.out.println("      LAYER " + i + " [ ");
             //Loop Through Each Neuron
             for(int j = 0; j < l.listNeurons.size(); j++){
                 Neuron n = l.listNeurons.get(j);
-                System.out.format(" A:%.2f B:%.2f C:%.2f D:%.2f ", listInputs.get(0), listInputs.get(1), listInputs.get(2), listInputs.get(3));
+                System.out.print("          NEURON     [");
+                for(int k = 0; k < n.numWeights(); k++){
+                    System.out.print(n.getWeight(k) + " ");
+                }
+                System.out.println();
+
             }
+            System.out.println();
         }
 
     }
@@ -156,12 +164,13 @@ public class NeuralNet {
         //update the inputs
         updateInputs();
         if(owner.isFirstCreature()){
-          //  debugNet();
+            debugNet();
         }
 
         //update neural network with a copy of the updated inputs
 
-        ArrayList<Double>outputs = update(copyDoubleList(listInputs));
+       // ArrayList<Double>outputs = update(copyDoubleList(listInputs));
+        ArrayList<Double>outputs = update(new ArrayList<Double>((ArrayList<Double>)listInputs.clone()));
 
         //update the outputs.
 
@@ -169,9 +178,9 @@ public class NeuralNet {
         //wire outputs[0] to thrust forward
         if(owner.isFirstCreature()){
             //list outputs
-            for(int i = 0; i < outputs.size(); i ++){
-                System.out.println("Outputs: " + i + " " + outputs.get(i));
-            }
+           // for(int i = 0; i < outputs.size(); i ++){
+            //    System.out.println("Outputs: " + i + " " + outputs.get(i));
+           // }
             //System.out.print(" out [ ");
            // System.out.format(" A:%.2f B:%.2f C:%.2f ", outputs.get(0), outputs.get(1), outputs.get(2));
 
@@ -236,8 +245,8 @@ public class NeuralNet {
              */
             for(int j = 0; j < listLayers.get(i).numNeurons; j++){
                 double netInput = 0;
-                int numWeights = listLayers.get(i).listNeurons.get(j).listWeights.size();
-                int nInputs = listLayers.get(i).listNeurons.get(j).numInputs;
+                int numWeights = listLayers.get(i).listNeurons.get(j).numWeights();
+                int nInputs = listLayers.get(i).listNeurons.get(j).getNumInputs();
 
                 //for each weight
                 for(int k = 0; k < nInputs - 1; k++){
@@ -251,14 +260,15 @@ public class NeuralNet {
                     //System.out.println("isFirstCreature: " + owner.isFirstCreature() + " i j k index: " + i + " " + j + " " + k + " " + index);
                     NeuronLayer nLayer = listLayers.get(i);
                     Neuron neuren = nLayer.listNeurons.get(j);
-                    double weight = neuren.listWeights.get(k);
+                    double weight = neuren.getWeight(k);
                     double input = inputsList.get(index);
 
                     netInput = netInput + weight * input;
                 }
 
+                double bias = Utils.dBias;
                 //add in the bias
-                netInput += listLayers.get(i).listNeurons.get(j).listWeights.get(nInputs-1) * Utils.dBias;
+                netInput += listLayers.get(i).listNeurons.get(j).getWeight(nInputs-1) * Utils.dBias;
 
                 /** we can store the outputs from each layer as we generate them.
                  *  The combined activation is filtered through the sigmoid function
@@ -269,11 +279,13 @@ public class NeuralNet {
                 //if(i == numHiddenLayers){
                 //    outputs.add(netInput);
                // }else{
-                    outputs.add(sigmoid(netInput, Utils.ActivationResponse));
+                double sigVal = sigmoid(netInput, Utils.ActivationResponse);
+                    outputs.add(sigVal);
                 //}
 
                 cWeight = 0;
             }
+            //System.out.println("break");
         }
         return outputs;
     }
@@ -318,48 +330,6 @@ public class NeuralNet {
     PRIVATE CLASSES
      */
 
-    /**
-     * Neuron
-     */
-    private class Neuron{
-        // number of inputs into the neuron
-        int numInputs;
 
-        //the wedights for each input
-        ArrayList<Double> listWeights;
 
-        public Neuron(int ni){
-            this.numInputs = ni+1; //increase by one because we are going to store bias
-            listWeights = new ArrayList<Double>();
-            //setup weights with initial random value.
-            for(int i = 0; i < numInputs; i++){
-
-                listWeights.add(new Double(MathUtils.random(-1f, 1f)));
-
-            }
-
-        }
-    }
-
-    /**
-     * NeuronLayer
-     */
-    private class NeuronLayer{
-        //The number of neurons in this layer.
-        int numNeurons;
-
-        //A list of the neurons in this layer.
-        ArrayList<Neuron>listNeurons;
-
-        //Constructor
-        public NeuronLayer(int numNeur, int numInputsPerNeuron){
-            listNeurons = new ArrayList<Neuron>();
-            numNeurons = numNeur;
-
-            //create neurons in layer.
-            for(int i = 0; i < numNeurons; i++){
-                listNeurons.add(new Neuron(numInputsPerNeuron));
-            }
-        }
-    }
 }

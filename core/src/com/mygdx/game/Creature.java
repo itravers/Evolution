@@ -547,8 +547,8 @@ public class Creature {
     private void initializeBrain(){
         int inputs = 12;
         int outputs = 3;
-        int hiddenLayers = 3;
-        int neuronsPerHiddenLayer = 6;
+        int hiddenLayers = 2;
+        int neuronsPerHiddenLayer = 3;
 
         neuralNet = new NeuralNet(this, inputs,outputs,hiddenLayers,neuronsPerHiddenLayer);
 
