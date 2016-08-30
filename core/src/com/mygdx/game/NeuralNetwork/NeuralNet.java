@@ -123,8 +123,56 @@ public class NeuralNet {
         }
     }
 
+    /**
+     * Given an input List, we create and return an output list.
+     * @param inputs
+     * @return
+     */
     ArrayList<Double>update(ArrayList<Double>inputs){
+        //Store the resulting outputs from each layer
+        ArrayList<Double> outputs = new ArrayList<Double>();
+        int cWeight = 0;
 
+        //First check that we have a good amount of inputs
+        if(inputs.size() != numInputs){
+            //return an emtpy vector
+            System.out.println("updating neural network: input Num not correct");
+            return outputs;
+        }
+
+        //for Each Layer
+        for(int i = 0; i < numHiddenLayers + 1; i++){
+            if( i > 0){
+                inputs = outputs;
+            }
+            outputs.clear();
+            cWeight = 0;
+
+            /**
+             * For each neuron sum the (inputs * corresponding weights). Give the
+             * total to sigmoid to get proper output.
+             */
+            for(int j = 0; j < listLayers.get(i).numNeurons; j++){
+                double netInput = 0;
+                int numInputs = listLayers.get(i).listNeurons.get(j).numInputs;
+
+                //for each weight
+                for(int k = 0; k < numInputs - 1; k++){
+                    //sum the weights * inputs
+                    netInput += listLayers.get(i).listNeurons.get(j).listWeights.get(k) * inputs.get(cWeight++);
+                }
+
+                //add in the bias
+                netInput += listLayers.get(i).listNeurons.get(j).listWeights.get(numInputs-1) * Utils.dBias;
+
+                /** we can store the outputs from each layer as we generate them.
+                 *  The combined activation is filtered through the sigmoid function
+                 */
+                outputs.add(sigmoid(netInput, Utils.ActivationResponse));
+                cWeight = 0;
+            }
+        }
+        return outputs;
     }
 
     public Double sigmoid(double netInput, double response){
