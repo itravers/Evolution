@@ -71,7 +71,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			Vector2 size = new Vector2(5 , 10);
 			Vector2 position = new Vector2(getRandomPositionFromSize(size));
 			int generation = 0; //This is a 0th generation creature.
-			Creature c = new Creature(this, physicsWorld, position,  size, generation);
+			Creature c = new Creature(this, physicsWorld, position,  size, generation, i);
 			//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 			creatures.add(c);
 		}

@@ -11,6 +11,10 @@ import com.mygdx.game.NeuralNetwork.NeuralNet;
 public class Creature {
     MyGdxGame parent;
 
+
+
+    private boolean isFirstCreature = false;
+
     //Physics Fields
     private BodyDef bodyDef;
     private Body body;
@@ -57,12 +61,16 @@ public class Creature {
     private int generation; //Used by genetic algorithm to track which generation this is in.
     private boolean isPregnant = false; //used to check if we need to birth a child next update.
 
-    public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen){
+    public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen, int num){
         this.parent = parent;
         this.size = size;
         this.generation = gen;
 
         setupPhysics(physicsWorld, position, size);
+
+        //don't give a brain to the first one, I want to control it.
+
+        if(num == 0)isFirstCreature = true;
         initializeBrain();
 
     }
@@ -205,6 +213,7 @@ public class Creature {
     }
 
     public void setThrustForwardPressed(boolean thrustForwardPressed) {
+        //System.out.println(this.toString() + " Thrust Forward Pressed");
         this.thrustForwardPressed = thrustForwardPressed;
     }
 
@@ -212,10 +221,11 @@ public class Creature {
      * This Creature will eat the given food.
      */
     public void eat(Food f){
-        System.out.println("Creature has eaten food.");
+        System.out.println("Creature has eaten food: " + f.getLIFE_VALUE());
         //First our LIFE_LEFT is incremented with the foods value
         LIFE_LEFT += f.getLIFE_VALUE();
 
+        System.out.println("Creature has eaten food: " + f.getLIFE_VALUE() + " lifeLeft: " + LIFE_LEFT);
         //reset the food.
         f.reset();
     }
@@ -343,7 +353,7 @@ public class Creature {
         Vector2 position = new Vector2(getPos());
         //the new creature's generation will be the interger average of the parents + 1
        // int averageGeneration = ((this.generation + otherCreature.generation)/2)+1;
-        Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1);
+        Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1, 1);
         //add new creature to game list
         parent.creatures.add(c);
         isPregnant = false;
@@ -579,6 +589,14 @@ public class Creature {
 
     public float getFitness(){
         return fitness;
+    }
+
+    public boolean isFirstCreature() {
+        return isFirstCreature;
+    }
+
+    public void setFirstCreature(boolean firstCreature) {
+        isFirstCreature = firstCreature;
     }
 
 
