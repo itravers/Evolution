@@ -200,15 +200,17 @@ public class Creature {
         //Now we have the closest creature, lets get a vector from us to them.
         Vector2 toClosest = new Vector2(closestCreature.body.getPosition().sub(body.getPosition()));
         toClosest.x = toClosest.x * parent.PIXELS_TO_METERS;
-        toClosest.y = -toClosest.y * parent.PIXELS_TO_METERS;
+        toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
         //System.out.println("ToClosestCreature + " + toClosest);
         return toClosest;
     }
+
 
     /**
      * This will return a vector pointing towards the closest creature to this creature.
      * @return
      */
+    /*
     public Vector2 to2ndClosestCreature(){
         //First search for the closest creature
         float distanceToClosestCreature = 101010101f;
@@ -220,12 +222,13 @@ public class Creature {
             Creature c = parent.creatures.get(i);
             if(c != this){
                 float dist =  body.getPosition().dst(c.getPos());
-                if(dist < distanceToClosestCreature){
+                if(Math.abs(dist) < Math.abs(distanceToClosestCreature)){
                     distanceTo2ndClosestCreature = distanceToClosestCreature;
                     secondClosestCreature = closestCreature;
 
                     distanceToClosestCreature = dist;
                     closestCreature = c;
+                    System.out.println("Distance Closest -> 2ndClosest: " + distanceToClosestCreature + " " + distanceTo2ndClosestCreature);
 
 
                 }
@@ -235,8 +238,35 @@ public class Creature {
         //Now we have the closest creature, lets get a vector from us to them.
         Vector2 to2ndClosest = new Vector2(secondClosestCreature.body.getPosition().sub(body.getPosition()));
         to2ndClosest.x = to2ndClosest.x * parent.PIXELS_TO_METERS;
-        to2ndClosest.y = -to2ndClosest.y * parent.PIXELS_TO_METERS;
+        to2ndClosest.y = to2ndClosest.y * parent.PIXELS_TO_METERS;
         //System.out.println("ToClosestCreature + " + toClosest);
         return to2ndClosest;
+    }
+    */
+
+    /**
+     * This will return a vector pointing towards the closest creature to this creature.
+     * @return
+     */
+    public Vector2 toClosestFood(){
+        //First search for the closest food
+        float distanceToClosestFood = 101010101f;
+        Food closestFood = parent.foods.get(0);
+        for(int i = 0; i < parent.foods.size(); i++){
+            Food f = parent.foods.get(i);
+                float dist =  body.getPosition().dst(f.getPos());
+                if(dist < distanceToClosestFood){
+                    distanceToClosestFood = dist;
+                    closestFood = f;
+                }
+
+        }
+
+        //Now we have the closest creature, lets get a vector from us to them.
+        Vector2 toClosest = new Vector2(closestFood.getBody().getPosition().sub(body.getPosition()));
+        toClosest.x = toClosest.x * parent.PIXELS_TO_METERS;
+        toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
+        //System.out.println("ToClosestCreature + " + toClosest);
+        return toClosest;
     }
 }

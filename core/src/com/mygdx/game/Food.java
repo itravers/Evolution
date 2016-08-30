@@ -18,6 +18,9 @@ public class Food {
 
     //Physics Fields
     private BodyDef bodyDef;
+
+
+
     private Body body;
     private CircleShape shape;
     private FixtureDef fixtureDef;
@@ -122,6 +125,10 @@ public class Food {
 
             newPosition = null;
         }
+    }
+
+    public Body getBody() {
+        return body;
     }
 
 }
