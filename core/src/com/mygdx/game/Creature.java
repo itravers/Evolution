@@ -313,6 +313,8 @@ public class Creature {
         }else{
             this.REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
             this.LIFE_LEFT = LIFE_SPAN;
+            numChildren = 0;
+            replaceBrain();
             System.out.println("time out, havn't procreated, don't kill");
         }
     }
@@ -331,6 +333,10 @@ public class Creature {
 
     public void incrementNumChildren() {
         this.numChildren += .5f;
+    }
+
+    private void replaceBrain(){
+        
     }
 
 }
