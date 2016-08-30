@@ -172,4 +172,36 @@ public class Creature {
     public Vector2 getSize(){
         return size;
     }
+
+    public void mate(Creature otherCreature){
+        System.out.println("THESE CREATURES HAVE MATED");
+    }
+
+    /**
+     * This will return a vector pointing towards the closest creature to this creature.
+     * @return
+     */
+    public Vector2 toClosestCreature(){
+        //First search for the closest creature
+        float distanceToClosestCreature = 101010101f;
+        Creature closestCreature = parent.creatures.get(0);
+        for(int i = 0; i < parent.creatures.size(); i++){
+            //we don't want to compare ourselve to ourself
+            Creature c = parent.creatures.get(i);
+            if(c != this){
+                float dist =  body.getPosition().dst(c.getPos());
+                if(dist < distanceToClosestCreature){
+                    distanceToClosestCreature = dist;
+                    closestCreature = c;
+                }
+            }
+        }
+
+        //Now we have the closest creature, lets get a vector from us to them.
+        Vector2 toClosest = new Vector2(closestCreature.body.getPosition().sub(body.getPosition()));
+        toClosest.x = toClosest.x * parent.PIXELS_TO_METERS;
+        toClosest.y = -toClosest.y * parent.PIXELS_TO_METERS;
+        //System.out.println("ToClosestCreature + " + toClosest);
+        return toClosest;
+    }
 }

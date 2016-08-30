@@ -71,6 +71,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 			creatures.add(c);
 		}
+		System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
 
 	}
 
@@ -204,9 +205,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 				if (a instanceof Creature && b instanceof Creature) {
 					//Creature to Creature Collision
-					System.out.println("Creature to Creature Collision");
+					//System.out.println("Creature to Creature Collision");
 					//we want them to try to mate
-					//a.mate(b);
+					((Creature)a).mate((Creature)b);
 				} else if ((a instanceof Creature && b instanceof Food) || (b instanceof Creature && a instanceof Food)) {
 					//Creature to Food Collision
 					//System.out.println("Creature to Food Collsion");
