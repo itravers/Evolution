@@ -90,6 +90,7 @@ public class Creature {
     public void update(){
 
         if(isPregnant)birthChild();
+        transferScreens();
 
         //System.out.println("LIFE_LEFT: " + LIFE_LEFT);
         //get input and apply inpulses.
@@ -419,6 +420,25 @@ public class Creature {
 
     private void replaceBrain(){
 
+    }
+
+    public void transferScreens(){
+
+        int screenWidth = Gdx.graphics.getWidth();
+        int screenHeight = Gdx.graphics.getHeight();
+
+        //teleport from right to left
+        if(getPos().x >= screenWidth){
+            setPos(new Vector2(getPos().x - screenWidth, getPos().y));
+        }else if(getPos().x < 0){
+            setPos(new Vector2(screenWidth - getPos().x, getPos().y));
+        }
+
+        if(getPos().y >= screenHeight){
+            setPos(new Vector2(getPos().x, getPos().y - screenHeight));
+        }else if(getPos().y < 0){
+            setPos(new Vector2(getPos().x, screenHeight - getPos().y));
+        }
     }
 
 
