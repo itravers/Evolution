@@ -44,7 +44,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
-		createCreatures(2);
+		createCreatures(3);
 		createFood(2);
 	}
 
@@ -72,6 +72,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			creatures.add(c);
 		}
 		System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
+		System.out.println("To2ndClosest: " + creatures.get(0).to2ndClosestCreature());
 
 	}
 

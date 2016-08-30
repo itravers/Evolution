@@ -204,4 +204,39 @@ public class Creature {
         //System.out.println("ToClosestCreature + " + toClosest);
         return toClosest;
     }
+
+    /**
+     * This will return a vector pointing towards the closest creature to this creature.
+     * @return
+     */
+    public Vector2 to2ndClosestCreature(){
+        //First search for the closest creature
+        float distanceToClosestCreature = 101010101f;
+        float distanceTo2ndClosestCreature = 101010101f;
+        Creature closestCreature = this;
+        Creature secondClosestCreature = this;
+        for(int i = 0; i < parent.creatures.size(); i++){
+            //we don't want to compare ourselve to ourself
+            Creature c = parent.creatures.get(i);
+            if(c != this){
+                float dist =  body.getPosition().dst(c.getPos());
+                if(dist < distanceToClosestCreature){
+                    distanceTo2ndClosestCreature = distanceToClosestCreature;
+                    secondClosestCreature = closestCreature;
+
+                    distanceToClosestCreature = dist;
+                    closestCreature = c;
+
+
+                }
+            }
+        }
+
+        //Now we have the closest creature, lets get a vector from us to them.
+        Vector2 to2ndClosest = new Vector2(secondClosestCreature.body.getPosition().sub(body.getPosition()));
+        to2ndClosest.x = to2ndClosest.x * parent.PIXELS_TO_METERS;
+        to2ndClosest.y = -to2ndClosest.y * parent.PIXELS_TO_METERS;
+        //System.out.println("ToClosestCreature + " + toClosest);
+        return to2ndClosest;
+    }
 }
