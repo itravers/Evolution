@@ -46,7 +46,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
 		createFood(2);
-		createCreatures(3);
+		createCreatures(2);
 
 	}
 
@@ -69,7 +69,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		for(int i = 0; i < num; i++) {
 			Vector2 size = new Vector2(5 , 10);
 			Vector2 position = new Vector2(getRandomPositionFromSize(size));
-			Creature c = new Creature(this, physicsWorld, position,  size);
+			int generation = 0; //This is a 0th generation creature.
+			Creature c = new Creature(this, physicsWorld, position,  size, generation);
 			//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 			creatures.add(c);
 		}

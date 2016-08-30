@@ -121,14 +121,18 @@ public class Food {
     public void update(){
         if(newPosition != null){
             System.out.println("moving food to: " + newPosition.x + ":" + newPosition.y);
-            body.setTransform((newPosition.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-newPosition.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS, body.getAngle());
-
+           setPos(newPosition);
             newPosition = null;
         }
     }
 
     public Body getBody() {
         return body;
+    }
+
+    public void setPos(Vector2 p){
+        body.setTransform((p.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-p.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS, body.getAngle());
+
     }
 
 }

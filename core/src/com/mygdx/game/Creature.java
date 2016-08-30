@@ -47,11 +47,15 @@ public class Creature {
 
 
 
-    private float numChildren = 0; //The number of children this creature has spawned. Does not need to be whole number.
+    private int numChildren = 0; //The number of children this creature has spawned.
 
-    public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
+    private int generation; //Used by genetic algorithm to track which generation this is in.
+    private boolean isPregnant = false; //used to check if we need to birth a child next update.
+
+    public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen){
         this.parent = parent;
         this.size = size;
+        this.generation = gen;
         setupPhysics(physicsWorld, position, size);
 
     }
@@ -85,6 +89,8 @@ public class Creature {
 
     public void update(){
 
+        if(isPregnant)birthChild();
+
         //System.out.println("LIFE_LEFT: " + LIFE_LEFT);
         //get input and apply inpulses.
         if(isThrustForwardPressed()){
@@ -108,17 +114,28 @@ public class Creature {
             }
         }
 
-        float elapsedTime = 1000/parent.fps;
+        float time = 1000/parent.fps;
+        int elapsedTime = (int)(time * 1);
         // System.out.println("ElapsedTime" + elapsedTime);
 
         //Change Timers
-        REFACTORY_TIME_LEFT -= elapsedTime;
-        if(REFACTORY_TIME_LEFT < 0)REFACTORY_TIME_LEFT = 0;
-        System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
+        //REFACTORY_TIME_LEFT -= elapsedTime;
+
+        if(getREFACTORY_TIME_LEFT() <= 0){
+            setREFACTORY_TIME_LEFT(0);
+        }else{
+            setREFACTORY_TIME_LEFT(getREFACTORY_TIME_LEFT()-elapsedTime);
+            if(REFACTORY_TIME_LEFT % 1000 == 0)System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
+        }
+        //if((REFACTORY_TIME_LEFT > 4900 && REFACTORY_TIME_LEFT <= 5000) || (REFACTORY_TIME_LEFT > 0 && REFACTORY_TIME_LEFT <= 5))System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
+
+
         LIFE_LEFT -= elapsedTime;
         if(LIFE_LEFT <= 0){
             kill();
         }
+
+        if(LIFE_LEFT % 1000 == 0)System.out.println("LIFE_LEFTT: " + LIFE_LEFT);
 
     }
 
@@ -197,13 +214,11 @@ public class Creature {
 
     public void mate(Creature otherCreature){
         //these creatures cannot mate if either of them have any time left on their  REFACTORY_TIME_LEFT
-        if((this.getREFACTORY_TIME_LEFT() + otherCreature.getREFACTORY_TIME_LEFT())>0){
-            System.out.println("THESE CREATURES HAVE MATED");
-            this.resetProcreationTimer();
-            otherCreature.resetProcreationTimer();
-            this.incrementNumChildren();
-            otherCreature.incrementNumChildren();
 
+        //we can't create a new creature when called from the collision code (this is)
+        //so we are going to set a flag, and in the render code, we will add the new creature
+        if(this.getREFACTORY_TIME_LEFT() == 0 && otherCreature.getREFACTORY_TIME_LEFT() == 0){
+           isPregnant = true;
         }
 
     }
@@ -234,6 +249,24 @@ public class Creature {
         toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
         //System.out.println("ToClosestCreature + " + toClosest);
         return toClosest;
+    }
+
+    private void birthChild(){
+        System.out.println("THESE CREATURES HAVE MATED");
+        this.resetProcreationTimer();
+        //otherCreature.resetProcreationTimer();
+        this.incrementNumChildren();
+        //otherCreature.incrementNumChildren();
+
+        Vector2 size = new Vector2(5 , 10);
+        Vector2 position = new Vector2(getPos());
+        //the new creature's generation will be the interger average of the parents + 1
+       // int averageGeneration = ((this.generation + otherCreature.generation)/2)+1;
+        Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1);
+        //add new creature to game list
+        parent.creatures.add(c);
+        isPregnant = false;
+
     }
 
 
@@ -324,12 +357,38 @@ public class Creature {
             parent.physicsWorld.destroyBody(this.body);
             parent.creatures.remove(this);
         }else{
-            this.REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
-            this.LIFE_LEFT = LIFE_SPAN;
-            numChildren = 0;
-            replaceBrain();
-            System.out.println("time out, havn't procreated, don't kill");
+
+
+            procreateASexually();
         }
+    }
+
+    /**
+     * 1. this will be called if the creature has procreated naturally
+     * 2. called from where it dies.
+     *
+     * 1.Moves to new random location.
+     * 2. resets refactory time.
+     * 3. resets life left.
+     * 4. resets Num Children
+     * 5. Replace Brain with a new one selected by the genetic algorithm
+     */
+
+
+    /**
+     * Create a new creature and remove this one
+     */
+    private void procreateASexually(){
+        this.REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
+        this.LIFE_LEFT = LIFE_SPAN;
+
+        numChildren = 0;
+        replaceBrain();
+        Vector2 newPos = parent.getRandomPosition(this);
+        setPos(newPos);
+        //this.body.setTransform(newPos, this.body.getAngle());
+       // this.
+        System.out.println("time out, havn't procreated, a-sexually procreate @ " + newPos);
     }
 
     private boolean hasProcreated(){
@@ -340,20 +399,27 @@ public class Creature {
         return returnVal;
     }
 
-    public float getNumChildren() {
+    public int getNumChildren() {
         return numChildren;
     }
 
     public void incrementNumChildren() {
-        this.numChildren += .5f;
+        this.numChildren += 1;
     }
 
     private void resetProcreationTimer(){
+        System.out.println("ProcreationTimerReset");
         this.setREFACTORY_TIME_LEFT(Creature.REFACTORY_LIMIT);
+    }
+
+    public void setPos(Vector2 p){
+        body.setTransform((p.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-p.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS, body.getAngle());
+
     }
 
     private void replaceBrain(){
 
     }
+
 
 }
