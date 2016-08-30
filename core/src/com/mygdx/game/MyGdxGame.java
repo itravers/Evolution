@@ -45,16 +45,19 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
 		createCreatures();
-		createFood();
+		createFood(2);
 	}
 
-	private void createFood(){
+	private void createFood(int num){
 		foods = new ArrayList<Food>();
-		Vector2 position = new Vector2(Gdx.graphics.getWidth()/4, Gdx.graphics.getHeight() / 4);
-		Vector2 size = new Vector2(25 , 25);
-		Food f = new Food(this, physicsWorld, position, size, getRandomFoodValue());
-		System.out.println("FPOS: " + (int)f.getPos().x + ":" + f.getPos().y);
-		foods.add(f);
+		for(int i = 0; i < num; i++) {
+			Vector2 size = new Vector2(25, 25);
+			Vector2 position = new Vector2(getRandomPositionFromSize(size));
+
+			Food f = new Food(this, physicsWorld, position, size, getRandomFoodValue());
+			//System.out.println("FPOS: " + (int)f.getPos().x + ":" + f.getPos().y);
+			foods.add(f);
+		}
 	}
 
 	private void createCreatures(){
@@ -237,14 +240,17 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 	public Vector2 getRandomPosition(Object o){
 		Vector2 size;
-		float xLimit = Gdx.graphics.getWidth();
-		float yLimit = Gdx.graphics.getHeight();
-
 		if(o instanceof Creature){
 			size = ((Creature)o).getSize();
 		}else{
 			size = ((Food)o).getSize();
 		}
+		return getRandomPositionFromSize(size);
+	}
+
+	public Vector2 getRandomPositionFromSize(Vector2 size){
+		float xLimit = Gdx.graphics.getWidth();
+		float yLimit = Gdx.graphics.getHeight();
 		return new Vector2(MathUtils.random(xLimit)-size.x, MathUtils.random(yLimit)-size.y);
 	}
 
