@@ -108,7 +108,19 @@ public class NeuralNet {
      * @param w
      */
     public void putWeights(ArrayList<Double>w){
+        int weightCount = 0;
 
+        //for each layer
+        for(int i = 0; i < numHiddenLayers + 1; i++){
+            //for each neuron
+            for(int j = 0; j < listLayers.get(i).numNeurons; j++){
+                //for each weight
+                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).numInputs; k++){
+                    listLayers.get(i).listNeurons.get(j).listWeights = w;
+
+                }
+            }
+        }
     }
 
     ArrayList<Double>update(ArrayList<Double>inputs){
