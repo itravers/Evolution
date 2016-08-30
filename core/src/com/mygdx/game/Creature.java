@@ -38,6 +38,9 @@ public class Creature {
     private float MAX_SPEED = .5f;
     private float MAX_ROTATION_SPEED = 10f;
 
+    private float LIFE_SPAN = 10f;
+    private float LIFE_LEFT = LIFE_SPAN;
+
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
         this.parent = parent;
         this.size = size;
@@ -152,5 +155,21 @@ public class Creature {
 
     public void setThrustForwardPressed(boolean thrustForwardPressed) {
         this.thrustForwardPressed = thrustForwardPressed;
+    }
+
+    /**
+     * This Creature will eat the given food.
+     */
+    public void eat(Food f){
+        System.out.println("Creature has eaten food.");
+        //First our LIFE_LEFT is incremented with the foods value
+        LIFE_LEFT += f.getLIFE_VALUE();
+
+        //reset the food.
+        f.reset();
+    }
+
+    public Vector2 getSize(){
+        return size;
     }
 }

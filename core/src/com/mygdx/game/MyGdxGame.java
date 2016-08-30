@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -49,9 +50,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 	private void createFood(){
 		foods = new ArrayList<Food>();
-		Vector2 position = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
+		Vector2 position = new Vector2(Gdx.graphics.getWidth()/4, Gdx.graphics.getHeight() / 4);
 		Vector2 size = new Vector2(25 , 25);
-		Food f = new Food(this, physicsWorld, position, size);
+		Food f = new Food(this, physicsWorld, position, size, getRandomFoodValue());
 		System.out.println("FPOS: " + (int)f.getPos().x + ":" + f.getPos().y);
 		foods.add(f);
 	}
@@ -70,6 +71,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	public void render () {
 		camera.update();
 		updateCreatures();
+		updateFood();
 		physicsWorld.step(1f/60f,6, 2);
 
 
@@ -91,6 +93,12 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	private void updateCreatures(){
 		for(int i = 0; i < creatures.size(); i++){
 			creatures.get(i).update();
+		}
+	}
+
+	private void updateFood(){
+		for(int i = 0; i < foods.size(); i++){
+			foods.get(i).update();
 		}
 	}
 	
@@ -190,9 +198,21 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 				if (a instanceof Creature && b instanceof Creature) {
 					//Creature to Creature Collision
 					System.out.println("Creature to Creature Collision");
+					//we want them to try to mate
+					//a.mate(b);
 				} else if ((a instanceof Creature && b instanceof Food) || (b instanceof Creature && a instanceof Food)) {
 					//Creature to Food Collision
-					System.out.println("Creature to Food Collsion");
+					//System.out.println("Creature to Food Collsion");
+					Creature c;
+					Food f;
+					if((a instanceof Creature && b instanceof Food)){
+						c = (Creature)a;
+						f = (Food)b;
+					}else{
+						c = (Creature)b;
+						f = (Food)a;
+					}
+					c.eat(f); //The Creature Eats the food.
 				}
 
 
@@ -213,5 +233,22 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 			}
 		});
+	}
+
+	public Vector2 getRandomPosition(Object o){
+		Vector2 size;
+		float xLimit = Gdx.graphics.getWidth();
+		float yLimit = Gdx.graphics.getHeight();
+
+		if(o instanceof Creature){
+			size = ((Creature)o).getSize();
+		}else{
+			size = ((Food)o).getSize();
+		}
+		return new Vector2(MathUtils.random(xLimit)-size.x, MathUtils.random(yLimit)-size.y);
+	}
+
+	public float getRandomFoodValue(){
+		return MathUtils.random(Food.LIMIT);
 	}
 }

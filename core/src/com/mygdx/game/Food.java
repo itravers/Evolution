@@ -23,18 +23,24 @@ public class Food {
     private FixtureDef fixtureDef;
     private Fixture fixture;
     private Vector2 size;
+    private Vector2 newPosition = null; //Used to update the position manually.
     public static final short CATEGORY = -2;
 
-    public Food(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
+
+    public static float LIMIT = 60; //The largest food possible.
+    private float LIFE_VALUE;
+
+    public Food(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, float value){
         this.parent = parent;
         this.size = size;
+        setLIFE_VALUE(value);
         setupPhysics(physicsWorld, position, size);
 
     }
 
     private void setupPhysics(World physicsWorld, Vector2 position, Vector2 size){
         bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
         //bodyDef.position.set(position);
         bodyDef.position.set((position.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-position.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS);
         //bodyDef.position.set((position.x + size.x / 2) / parent.PIXELS_TO_METERS,
@@ -51,6 +57,7 @@ public class Food {
         fixtureDef = new FixtureDef();
         fixtureDef.filter.groupIndex = CATEGORY;
         fixtureDef.shape = shape;
+        fixtureDef.isSensor = true;
 
         fixture = body.createFixture(fixtureDef);
         body.setUserData(this);
@@ -83,4 +90,38 @@ public class Food {
         //System.out.println("Graphics width: " + (Gdx.graphics.getWidth()/2));
         return pos;
     }
+
+    public float getLIFE_VALUE() {
+        return LIFE_VALUE;
+    }
+
+    public void setLIFE_VALUE(float LIFE_VALUE) {
+        this.LIFE_VALUE = LIFE_VALUE;
+    }
+
+    //Updates food to a new location, with a new value
+    public void reset(){
+        setPosition(parent.getRandomPosition(this));
+        setLIFE_VALUE(parent.getRandomFoodValue());
+    }
+
+    public void setPosition(Vector2 p){
+       // bodyDef.position.set((p.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-p.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS);
+        //body.setTransform(p, body.getAngle());
+        newPosition = p;
+    }
+
+    public Vector2 getSize(){
+        return size;
+    }
+
+    public void update(){
+        if(newPosition != null){
+            System.out.println("moving food to: " + newPosition.x + ":" + newPosition.y);
+            body.setTransform((newPosition.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-newPosition.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS, body.getAngle());
+
+            newPosition = null;
+        }
+    }
+
 }
