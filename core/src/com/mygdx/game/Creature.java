@@ -26,6 +26,10 @@ public class Creature {
     private float movePower = .0005f;
     private float rotationPower = .0000015f;
 
+    //AI
+    NeuralNet neuralNet;
+    float fitness = 0;
+
 
 
     //Inputs
@@ -57,7 +61,9 @@ public class Creature {
         this.parent = parent;
         this.size = size;
         this.generation = gen;
+
         setupPhysics(physicsWorld, position, size);
+        initializeBrain();
 
     }
 
@@ -89,7 +95,11 @@ public class Creature {
     }
 
     public void update(){
+        if(neuralNet != null){
+            neuralNet.update();
+        }
 
+        calculateFitness();
         if(isPregnant)birthChild();
         transferScreens();
 
@@ -127,7 +137,7 @@ public class Creature {
             setREFACTORY_TIME_LEFT(0);
         }else{
             setREFACTORY_TIME_LEFT(getREFACTORY_TIME_LEFT()-elapsedTime);
-            if(REFACTORY_TIME_LEFT % 1000 == 0)System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
+           // if(REFACTORY_TIME_LEFT % 1000 == 0)System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
         }
         //if((REFACTORY_TIME_LEFT > 4900 && REFACTORY_TIME_LEFT <= 5000) || (REFACTORY_TIME_LEFT > 0 && REFACTORY_TIME_LEFT <= 5))System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
 
@@ -137,7 +147,7 @@ public class Creature {
             kill();
         }
 
-        if(LIFE_LEFT % 1000 == 0)System.out.println("LIFE_LEFTT: " + LIFE_LEFT);
+       // if(LIFE_LEFT % 1000 == 0)System.out.println("LIFE_LEFTT: " + LIFE_LEFT);
 
     }
 
@@ -229,6 +239,7 @@ public class Creature {
      * This will return a vector pointing towards the closest creature to this creature.
      * @return
      */
+    /*
     public Vector2 toClosestCreature(){
         //First search for the closest creature
         float distanceToClosestCreature = 101010101f;
@@ -251,6 +262,74 @@ public class Creature {
         toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
         //System.out.println("ToClosestCreature + " + toClosest);
         return toClosest;
+    }
+    */
+
+    /**
+     * returns a reference to closest creature that is not me.
+     */
+    public Creature getClosestCreature(){
+        //First search for the closest creature
+        float distanceToClosestCreature = 101010101f;
+        //System.out.println("CRATURES "+parent.creatures);
+        Creature closestCreature = this;
+        if(!parent.creatures.isEmpty()){
+            for(int i = 0; i < parent.creatures.size(); i++){
+                //we don't want to compare ourselve to ourself
+                Creature c = parent.creatures.get(i);
+                if(c != this){
+                    float dist =  body.getPosition().dst(c.getPos());
+                    if(dist < distanceToClosestCreature){
+                        distanceToClosestCreature = dist;
+                        closestCreature = c;
+                    }
+                }
+            }
+        }
+
+
+        return closestCreature;
+    }
+
+    public Food getClosestFood(){
+        //First search for the closest creature
+        float distanceToClosestFood = 101010101f;
+        Food closestFood = null;
+        if(body != null){
+            for(int i = 0; i < parent.foods.size(); i++){
+                //we don't want to compare ourselve to ourself
+                Food f = parent.foods.get(i);
+                float dist =  body.getPosition().dst(f.getPos());
+
+                if(dist < distanceToClosestFood){
+                    distanceToClosestFood = dist;
+                    closestFood = f;
+                }
+
+            }
+        }
+
+        return closestFood;
+    }
+
+    /**
+     * Returns a Vector2 pointing from us to the given Creature
+     */
+    public Vector2 getVectorToCreature(Creature c){
+        Vector2 toClosest = null;
+        if(c != null){
+            toClosest = new Vector2(c.body.getPosition().sub(body.getPosition()));
+            toClosest.x = toClosest.x * parent.PIXELS_TO_METERS;
+            toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
+            //System.out.println("ToClosestCreature + " + toClosest);
+        }
+
+        return toClosest;
+    }
+
+    public Vector2 getVectorToClosestCreature(){
+        Creature closest = getClosestCreature();
+        return getVectorToCreature(closest);
     }
 
     private void birthChild(){
@@ -317,22 +396,29 @@ public class Creature {
     public Vector2 toClosestFood(){
         //First search for the closest food
         float distanceToClosestFood = 101010101f;
-        Food closestFood = parent.foods.get(0);
-        for(int i = 0; i < parent.foods.size(); i++){
-            Food f = parent.foods.get(i);
+        Vector2 toClosest = null;
+        Food closestFood = null;
+        if(body != null){
+            for(int i = 0; i < parent.foods.size(); i++){
+                Food f = parent.foods.get(i);
+               // System.out.println("body: " + body);
                 float dist =  body.getPosition().dst(f.getPos());
                 if(dist < distanceToClosestFood){
                     distanceToClosestFood = dist;
                     closestFood = f;
                 }
 
+            }
+
+            //Now we have the closest creature, lets get a vector from us to them.
+            toClosest = new Vector2(closestFood.getBody().getPosition().sub(body.getPosition()));
+            toClosest.x = toClosest.x * parent.PIXELS_TO_METERS;
+            toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
+            //System.out.println("ToClosestCreature + " + toClosest);
         }
 
-        //Now we have the closest creature, lets get a vector from us to them.
-        Vector2 toClosest = new Vector2(closestFood.getBody().getPosition().sub(body.getPosition()));
-        toClosest.x = toClosest.x * parent.PIXELS_TO_METERS;
-        toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
-        //System.out.println("ToClosestCreature + " + toClosest);
+
+
         return toClosest;
     }
 
@@ -355,7 +441,7 @@ public class Creature {
     private void kill(){
         LIFE_LEFT = 0;
         if(hasProcreated()){
-            System.out.println("time out, have procreated, do kill");
+            //System.out.println("time out, have procreated, do kill");
             parent.physicsWorld.destroyBody(this.body);
             parent.creatures.remove(this);
         }else{
@@ -389,7 +475,7 @@ public class Creature {
         setPos(newPos);
         //this.body.setTransform(newPos, this.body.getAngle());
        // this.
-        System.out.println("time out, havn't procreated, a-sexually procreate @ " + newPos);
+       // System.out.println("time out, havn't procreated, a-sexually procreate @ " + newPos);
     }
 
     private boolean hasProcreated(){
@@ -409,7 +495,7 @@ public class Creature {
     }
 
     private void resetProcreationTimer(){
-        System.out.println("ProcreationTimerReset");
+       // System.out.println("ProcreationTimerReset");
         this.setREFACTORY_TIME_LEFT(Creature.REFACTORY_LIMIT);
     }
 
@@ -418,9 +504,7 @@ public class Creature {
 
     }
 
-    private void replaceBrain(){
 
-    }
 
     public void transferScreens(){
 
@@ -439,6 +523,62 @@ public class Creature {
         }else if(getPos().y < 0){
             setPos(new Vector2(getPos().x, screenHeight - getPos().y));
         }
+    }
+
+    private void replaceBrain(){
+
+    }
+
+    /**
+     * Sets up an initial random neural network
+     * Hook up inputs
+     * Hook up outputs
+     */
+    private void initializeBrain(){
+        int inputs = 12;
+        int outputs = 3;
+        int hiddenLayers = 3;
+        int neuronsPerHiddenLayer = 6;
+
+        neuralNet = new NeuralNet(this, inputs,outputs,hiddenLayers,neuronsPerHiddenLayer);
+
+        //hookup inputs keep this synched with updateInputs in nn
+        Vector2 toClosestCreature = getVectorToClosestCreature();
+        Creature closestCreature = getClosestCreature();
+        Vector2 toClosestFood = toClosestFood();
+        Food closestFood = getClosestFood();
+
+
+        neuralNet.addInput(body.getLinearVelocity().x);
+        neuralNet.addInput(body.getLinearVelocity().y);
+        neuralNet.addInput(body.getAngularVelocity());
+
+        //System.out.println("toClosestCreature: " + toClosestCreature);
+        neuralNet.addInput(toClosestCreature.x);
+        neuralNet.addInput(toClosestCreature.y);
+        neuralNet.addInput(closestCreature.getREFACTORY_TIME_LEFT());
+        neuralNet.addInput(closestCreature.getFitness());
+
+        neuralNet.addInput(toClosestFood.x);
+        neuralNet.addInput(toClosestFood.y);
+        neuralNet.addInput(closestFood.getLIFE_VALUE());
+
+        neuralNet.addInput(LIFE_LEFT);
+        neuralNet.addInput(REFACTORY_TIME_LEFT);
+    }
+
+    public Body getBody(){return this.body;}
+
+    public int getLIFE_LEFT(){
+        return LIFE_LEFT;
+    }
+
+    public void calculateFitness(){
+        fitness = 0;
+    }
+
+    public float getFitness(){
+        return fitness;
     }
 
 

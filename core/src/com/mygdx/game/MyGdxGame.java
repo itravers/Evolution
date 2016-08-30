@@ -38,6 +38,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	
 	@Override
 	public void create () {
+
 		physicsWorld = new World(new Vector2(0, 0), true);
 		setupCollisionHandling();
 		debugRenderer = new Box2DDebugRenderer();
@@ -46,7 +47,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
 		createFood(2);
-		createCreatures(2);
+		createCreatures(20);
 
 	}
 
@@ -74,9 +75,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 			creatures.add(c);
 		}
-		System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
+		//System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
 		//System.out.println("To2ndClosest: " + creatures.get(0).to2ndClosestCreature());
-		System.out.println("ToClosestFood: " + creatures.get(0).toClosestFood());
+		//System.out.println("ToClosestFood: " + creatures.get(0).toClosestFood());
 
 	}
 
