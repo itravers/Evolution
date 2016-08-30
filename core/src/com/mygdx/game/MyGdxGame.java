@@ -12,6 +12,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	@Override
 	public void create () {
 		physicsWorld = new World(new Vector2(0, 0), true);
+		setupCollisionHandling();
 		debugRenderer = new Box2DDebugRenderer();
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch = new SpriteBatch();
@@ -45,7 +50,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	private void createFood(){
 		foods = new ArrayList<Food>();
 		Vector2 position = new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() / 2);
-		Vector2 size = new Vector2(5 , 10);
+		Vector2 size = new Vector2(25 , 25);
 		Food f = new Food(this, physicsWorld, position, size);
 		System.out.println("FPOS: " + (int)f.getPos().x + ":" + f.getPos().y);
 		foods.add(f);
@@ -169,5 +174,44 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	@Override
 	public boolean scrolled(int amount) {
 		return false;
+	}
+
+	private void setupCollisionHandling() {
+		physicsWorld.setContactListener(new ContactListener() {
+			@Override
+			public void beginContact(Contact contact) {
+				// Check to see if the collision is between the second sprite and the bottom of the screen
+				// If so apply a random amount of upward force to both objects... just because
+
+				Object a = contact.getFixtureA().getBody().getUserData();
+				Object b = contact.getFixtureB().getBody().getUserData();
+
+
+				if (a instanceof Creature && b instanceof Creature) {
+					//Creature to Creature Collision
+					System.out.println("Creature to Creature Collision");
+				} else if ((a instanceof Creature && b instanceof Food) || (b instanceof Creature && a instanceof Food)) {
+					//Creature to Food Collision
+					System.out.println("Creature to Food Collsion");
+				}
+
+
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+
+			}
+		});
 	}
 }
