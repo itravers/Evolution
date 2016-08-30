@@ -5,15 +5,81 @@ import com.badlogic.gdx.math.MathUtils;
 import java.util.ArrayList;
 
 /**
- * Created by slack on 8/29/16.
+ * Created by Isaac Assegai on 8/29/16.
  */
 public class NeuralNet {
 
+//private variables
+    private int numInputs;
+    private int numOutputs;
+    private int numHiddenLayers;
+    private int neuronsPerHiddenLayer;
+    private ArrayList<NeuronLayer> listLayers; //Storage for each layer of neurons Including output layer.
 
+//public variables
 
-    public NeuralNet(){
+    /**
+     * Constructor
+     * @param nInputs
+     * @param nOutputs
+     * @param nHiddenLayers
+     * @param nerPerHiddenLayer
+     */
+    public NeuralNet(int nInputs, int nOutputs, int nHiddenLayers, int nerPerHiddenLayer){
+        numInputs = nInputs;
+        numOutputs = nOutputs;
+        numHiddenLayers = nHiddenLayers;
+        neuronsPerHiddenLayer = nerPerHiddenLayer;
+
+        createNet();
 
     }
+
+//public methods
+
+    /**
+     * Build the Neural Network. Weights are initially set to random values -1 to +1
+     */
+    public void createNet(){
+        //create the layers of the network
+        if(numHiddenLayers > 0){
+
+        }
+    }
+
+    /**
+     * Gets the weights from the Neural Network
+     * @return
+     */
+    public ArrayList<Double> getWeights(){
+
+    }
+
+    /**
+     * Returns the total number of weights in net.
+     * @return
+     */
+    public int getNumperOfWeights(){
+
+    }
+
+    /**
+     * Replaces the weights with new ones.
+     * @param w
+     */
+    public void putWeights(ArrayList<Double>w){
+
+    }
+
+    ArrayList<Double>update(ArrayList<Double>inputs){
+
+    }
+
+    public Double sigmoid(double activation, double response){
+
+    }
+
+
 
 
     /*
@@ -35,7 +101,7 @@ public class NeuralNet {
 
             //setup weights with initial random value.
             for(int i = 0; i < numInputs; i++){
-                listWeights.add(new Double(MathUtils.random(0f, 100f)));
+                listWeights.add(new Double(MathUtils.random(-1f, 1f)));
 
             }
 
