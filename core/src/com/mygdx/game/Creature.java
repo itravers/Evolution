@@ -45,6 +45,9 @@ public class Creature {
 
     private int REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
 
+
+    private float numChildren = 0; //The number of children this creature has spawned. Does not need to be whole number.
+
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
         this.parent = parent;
         this.size = size;
@@ -63,7 +66,6 @@ public class Creature {
         body = physicsWorld.createBody(bodyDef);
         body.setLinearDamping(linearDamping);
         body.setAngularDamping(angularDamping);
-
         shape = new PolygonShape();
         shape.setAsBox((size.x /2)/parent.PIXELS_TO_METERS, (size.y / 2)/parent.PIXELS_TO_METERS);
         //shape.setAsBox((size.x / 2) / parent.PIXELS_TO_METERS,
@@ -81,10 +83,8 @@ public class Creature {
     }
 
     public void update(){
-        float elapsedTime = 1000/parent.fps;
-        System.out.println("ElapsedTime" + elapsedTime);
-        LIFE_LEFT -= elapsedTime;
-        System.out.println("LIFE_LEFT: " + LIFE_LEFT);
+
+        //System.out.println("LIFE_LEFT: " + LIFE_LEFT);
         //get input and apply inpulses.
         if(isThrustForwardPressed()){
             //System.out.println("currentSpeed: " + getCurrentSpeed());
@@ -105,6 +105,13 @@ public class Creature {
             if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
                 body.applyAngularImpulse(-rotationPower, true);
             }
+        }
+
+        float elapsedTime = 1000/parent.fps;
+        // System.out.println("ElapsedTime" + elapsedTime);
+        LIFE_LEFT -= elapsedTime;
+        if(LIFE_LEFT <= 0){
+            kill();
         }
 
     }
@@ -184,6 +191,8 @@ public class Creature {
 
     public void mate(Creature otherCreature){
         System.out.println("THESE CREATURES HAVE MATED");
+        this.incrementNumChildren();
+        otherCreature.incrementNumChildren();
     }
 
     /**
@@ -287,4 +296,41 @@ public class Creature {
     public int setREFACTORY_TIME_LEFT(int REFACTORY_TIME_LEFT) {
        return this.REFACTORY_TIME_LEFT = REFACTORY_TIME_LEFT;
     }
+
+    /**
+     * Kills this creature.
+     * If creature had no children, this creature won't actually die:
+     * It's brains will be replaced by one of the fittest of it's generation. It's REFACTORY_TIME_LEFT, and LIFE_LEFT will be reset.
+     *
+     * If it has had children it will be removed, dereferenced and left to the garabage collector
+     */
+    private void kill(){
+
+        if(hasProcreated()){
+            System.out.println("time out, have procreated, do kill");
+            parent.physicsWorld.destroyBody(this.body);
+            parent.creatures.remove(this);
+        }else{
+            this.REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
+            this.LIFE_LEFT = LIFE_SPAN;
+            System.out.println("time out, havn't procreated, don't kill");
+        }
+    }
+
+    private boolean hasProcreated(){
+        boolean returnVal = false;
+        if(getNumChildren() >= 1){
+            returnVal = true;
+        }
+        return returnVal;
+    }
+
+    public float getNumChildren() {
+        return numChildren;
+    }
+
+    public void incrementNumChildren() {
+        this.numChildren += .5f;
+    }
+
 }
