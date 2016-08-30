@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.mygdx.game.NeuralNetwork.NeuralNet;
 
 /**
  * Created by Isaac Assegai on 8/29/16.
@@ -382,7 +383,6 @@ public class Creature {
     private void procreateASexually(){
         this.REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
         this.LIFE_LEFT = LIFE_SPAN;
-
         numChildren = 0;
         replaceBrain();
         Vector2 newPos = parent.getRandomPosition(this);
