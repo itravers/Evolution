@@ -41,9 +41,23 @@ public class NeuralNet {
      * Build the Neural Network. Weights are initially set to random values -1 to +1
      */
     public void createNet(){
+
         //create the layers of the network
         if(numHiddenLayers > 0){
 
+            //create the first hidden layer
+            listLayers.add(new NeuronLayer(neuronsPerHiddenLayer, numInputs));
+
+            //create the other hidden layers, reference neuronsPerHiddenLayer as numInputs;
+            for(int i = 0; i < numHiddenLayers - 1; i++){
+                listLayers.add(new NeuronLayer(neuronsPerHiddenLayer, neuronsPerHiddenLayer));
+            }
+
+            //create output layer
+            listLayers.add(new NeuronLayer(numOutputs, neuronsPerHiddenLayer));
+        }else{
+            //create output layer if no hiddenLayers exist
+            listLayers.add(new NeuronLayer(numOutputs, numInputs));
         }
     }
 
