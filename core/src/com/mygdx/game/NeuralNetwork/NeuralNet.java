@@ -63,10 +63,23 @@ public class NeuralNet {
 
     /**
      * Gets the weights from the Neural Network
-     * @return
+     * @return A List Containing the weights
      */
     public ArrayList<Double> getWeights(){
+        //This holds the weights
+        ArrayList<Double>weights = new ArrayList<Double>();
 
+        //interate through each layer
+        for(int i = 0; i < numHiddenLayers + 1; i++){
+            //for each neuron in layer
+            for(int j = 0; j < listLayers.get(i).numNeurons; j++){
+                //for each weight
+                for(int k = 0; k < listLayers.get(i).listNeurons.get(j).numInputs; k++){
+                    weights.add(listLayers.get(i).listNeurons.get(j).listWeights.get(k));
+                }
+            }
+        }
+        return weights;
     }
 
     /**
