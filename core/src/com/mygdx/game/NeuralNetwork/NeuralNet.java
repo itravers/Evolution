@@ -127,8 +127,8 @@ public class NeuralNet {
 
     }
 
-    public Double sigmoid(double activation, double response){
-
+    public Double sigmoid(double netInput, double response){
+        return (1 / (1 + Math.exp(-netInput / response)));
     }
 
 
