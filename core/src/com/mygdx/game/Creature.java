@@ -46,6 +46,7 @@ public class Creature {
     private int REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
 
 
+
     private float numChildren = 0; //The number of children this creature has spawned. Does not need to be whole number.
 
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
@@ -109,6 +110,11 @@ public class Creature {
 
         float elapsedTime = 1000/parent.fps;
         // System.out.println("ElapsedTime" + elapsedTime);
+
+        //Change Timers
+        REFACTORY_TIME_LEFT -= elapsedTime;
+        if(REFACTORY_TIME_LEFT < 0)REFACTORY_TIME_LEFT = 0;
+        System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
         LIFE_LEFT -= elapsedTime;
         if(LIFE_LEFT <= 0){
             kill();
@@ -190,9 +196,16 @@ public class Creature {
     }
 
     public void mate(Creature otherCreature){
-        System.out.println("THESE CREATURES HAVE MATED");
-        this.incrementNumChildren();
-        otherCreature.incrementNumChildren();
+        //these creatures cannot mate if either of them have any time left on their  REFACTORY_TIME_LEFT
+        if((this.getREFACTORY_TIME_LEFT() + otherCreature.getREFACTORY_TIME_LEFT())>0){
+            System.out.println("THESE CREATURES HAVE MATED");
+            this.resetProcreationTimer();
+            otherCreature.resetProcreationTimer();
+            this.incrementNumChildren();
+            otherCreature.incrementNumChildren();
+
+        }
+
     }
 
     /**
@@ -305,7 +318,7 @@ public class Creature {
      * If it has had children it will be removed, dereferenced and left to the garabage collector
      */
     private void kill(){
-
+        LIFE_LEFT = 0;
         if(hasProcreated()){
             System.out.println("time out, have procreated, do kill");
             parent.physicsWorld.destroyBody(this.body);
@@ -335,8 +348,12 @@ public class Creature {
         this.numChildren += .5f;
     }
 
+    private void resetProcreationTimer(){
+        this.setREFACTORY_TIME_LEFT(Creature.REFACTORY_LIMIT);
+    }
+
     private void replaceBrain(){
-        
+
     }
 
 }
