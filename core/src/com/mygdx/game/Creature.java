@@ -35,11 +35,15 @@ public class Creature {
 
     //Collision Category
     public static final short CATEGORY = -1;
+    private static int REFACTORY_LIMIT = 5000; //seconds in refactory time.
     private float MAX_SPEED = .5f;
     private float MAX_ROTATION_SPEED = 10f;
 
-    private float LIFE_SPAN = 10f;
-    private float LIFE_LEFT = LIFE_SPAN;
+    private int LIFE_SPAN = 20000; //in milliseconds
+    private int LIFE_LEFT = LIFE_SPAN;
+
+
+    private int REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
 
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size){
         this.parent = parent;
@@ -77,6 +81,10 @@ public class Creature {
     }
 
     public void update(){
+        float elapsedTime = 1000/parent.fps;
+        System.out.println("ElapsedTime" + elapsedTime);
+        LIFE_LEFT -= elapsedTime;
+        System.out.println("LIFE_LEFT: " + LIFE_LEFT);
         //get input and apply inpulses.
         if(isThrustForwardPressed()){
             //System.out.println("currentSpeed: " + getCurrentSpeed());
@@ -98,6 +106,7 @@ public class Creature {
                 body.applyAngularImpulse(-rotationPower, true);
             }
         }
+
     }
 
 
@@ -268,5 +277,14 @@ public class Creature {
         toClosest.y = toClosest.y * parent.PIXELS_TO_METERS;
         //System.out.println("ToClosestCreature + " + toClosest);
         return toClosest;
+    }
+
+
+    public int getREFACTORY_TIME_LEFT() {
+        return REFACTORY_TIME_LEFT;
+    }
+
+    public int setREFACTORY_TIME_LEFT(int REFACTORY_TIME_LEFT) {
+       return this.REFACTORY_TIME_LEFT = REFACTORY_TIME_LEFT;
     }
 }

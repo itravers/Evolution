@@ -34,6 +34,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	ArrayList<Food> foods;
 
 	final float PIXELS_TO_METERS = 100f;
+	float fps = 60f;
 	
 	@Override
 	public void create () {
@@ -83,7 +84,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		camera.update();
 		updateCreatures();
 		updateFood();
-		physicsWorld.step(1f/60f,6, 2);
+		physicsWorld.step(1f/fps,6, 2);
 
 
 
