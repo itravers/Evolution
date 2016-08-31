@@ -88,7 +88,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}else{
 			c = new Creature(this, physicsWorld, position,  size, generation, creatureNum, g);
 		}
-
+		//c.neuralNet.putWeights(g);
 		//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 		creatures.add(c);
 

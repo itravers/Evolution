@@ -130,8 +130,9 @@ public class NeuralNet {
                 //for each weight
                 for(int k = 0; k < listLayers.get(i).listNeurons.get(j).getNumInputs(); k++){
                    // listLayers.get(i).listNeurons.get(j).listWeights = newListWeights;
-                    listLayers.get(i).listNeurons.get(j).replaceWeights(newListWeights);
-
+                   // listLayers.get(i).listNeurons.get(j).replaceWeights(newListWeights);
+                    listLayers.get(i).listNeurons.get(j).setWeight(k, newListWeights.get(weightCount));
+                    weightCount++;
                 }
             }
         }

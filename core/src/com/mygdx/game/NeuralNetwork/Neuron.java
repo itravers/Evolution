@@ -42,7 +42,7 @@ public class Neuron{
     }
 
     public void replaceWeights(ArrayList<Double>newWeights){
-        listWeights = newWeights;
+        listWeights = new ArrayList<Double>((ArrayList<Double>)newWeights.clone());
     }
 
     public int getNumInputs(){
