@@ -161,10 +161,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 			//check if creatures fitness is more than something else on the list
 			for(int j = 0; j < listFittestValues.size(); j++){
-				if(c.fitness > listFittestValues.get(i)){
+				if(c.fitness > listFittestValues.get(j)){
 					//put this characters genome and fitness values in place of the one in the list
-					listFittestGenomes.set(i, (ArrayList<Double>) c.neuralNet.getWeights().clone());
-					listFittestValues.set(i, (double) c.fitness);
+					listFittestGenomes.set(j, (ArrayList<Double>) c.neuralNet.getWeights().clone());
+					listFittestValues.set(j, (double) c.fitness);
 				}
 			}
 		}
