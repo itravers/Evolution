@@ -47,7 +47,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
 		createFood(2);
-		createCreatures(2);
+		createCreatures(20);
 
 	}
 
@@ -136,12 +136,12 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}else if(keycode == Input.Keys.A){
 			if(!creatures.isEmpty()){
 				//System.out.println("W Pressed");
-				creatures.get(0).setRotateLeftPressed(true);
+				//creatures.get(0).setRotateLeftPressed(true);
 			}
 		}else if(keycode == Input.Keys.D){
 			if(!creatures.isEmpty()){
 				//System.out.println("W Pressed");
-				creatures.get(0).setRotateRightPressed(true);
+				//creatures.get(0).setRotateRightPressed(true);
 			}
 		}
 		return false;
@@ -157,12 +157,12 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}else if(keycode == Input.Keys.A){
 			if(!creatures.isEmpty()){
 				//System.out.println("W Pressed");
-				creatures.get(0).setRotateLeftPressed(false);
+				//creatures.get(0).setRotateLeftPressed(false);
 			}
 		}else if(keycode == Input.Keys.D){
 			if(!creatures.isEmpty()){
 				//System.out.println("W Pressed");
-				creatures.get(0).setRotateRightPressed(false);
+				//creatures.get(0).setRotateRightPressed(false);
 			}
 		}
 		return false;

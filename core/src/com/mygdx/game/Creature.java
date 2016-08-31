@@ -27,8 +27,8 @@ public class Creature {
     private float density = 1.25f;
     private float friction = .5f;
     private Vector2 size;
-    private float movePower = .0005f;
-    private float rotationPower = .0000015f;
+    private double movePower = 0;///.0005f;
+    private double rotationPower = 0;///.0000015f;
 
     //AI
     NeuralNet neuralNet;
@@ -37,8 +37,7 @@ public class Creature {
 
 
     //Inputs
-    private boolean rotateRightPressed = false;
-    private boolean rotateLeftPressed = false;
+    private boolean rotate = false;
     private boolean thrustForwardPressed = false;
 
 
@@ -116,23 +115,31 @@ public class Creature {
         if(isThrustForwardPressed()){
             //System.out.println("currentSpeed: " + getCurrentSpeed());
             if(getCurrentSpeed() < MAX_SPEED){
-                Vector2 impulse = new Vector2(-(float)Math.sin(body.getAngle()), (float)Math.cos(body.getAngle())).scl(movePower);
+                Vector2 impulse = new Vector2(-(float)Math.sin(body.getAngle()), (float)Math.cos(body.getAngle())).scl((float)movePower);
                 body.applyLinearImpulse(impulse, body.getPosition(),true);
 
             }
         }
 
-        if(isRotateLeftPressed()){
+        if(isRotatePressed()){
+           // if(isFirstCreature())System.out.println("body.getAngularVelocity(): " + rotationPower + "  MAX_ROTATION_SPEED: " + MAX_ROTATION_SPEED);
             if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
-                body.applyAngularImpulse(+rotationPower, true);
+                if(isFirstCreature())System.out.println("Rotate: " + rotationPower);
+                body.applyAngularImpulse((float) rotationPower, true);
+            }
+        }
+
+        /*if(isRotateLeftPressed()){
+            if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
+                body.applyAngularImpulse((float)rotationPower, true);
             }
         }
 
         if(isRotateRightPressed()){
             if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
-                body.applyAngularImpulse(-rotationPower, true);
+                body.applyAngularImpulse((float)rotationPower, true);
             }
-        }
+        }8*/
 
         float time = 1000/parent.fps;
         int elapsedTime = (int)(time * 1);
@@ -192,21 +199,16 @@ public class Creature {
         return pos;
     }
 
-    public boolean isRotateRightPressed() {
-        return rotateRightPressed;
+    public boolean isRotatePressed() {
+        return rotate;
     }
 
-    public void setRotateRightPressed(boolean rotateRightPressed) {
-        this.rotateRightPressed = rotateRightPressed;
+    public void setRotatePressed(boolean rotate) {
+       // if(isFirstCreature())System.out.println("Rotate: " + rotate);
+        this.rotate = rotate;
     }
 
-    public boolean isRotateLeftPressed() {
-        return rotateLeftPressed;
-    }
 
-    public void setRotateLeftPressed(boolean rotateLeftPressed) {
-        this.rotateLeftPressed = rotateLeftPressed;
-    }
 
     public boolean isThrustForwardPressed() {
         return thrustForwardPressed;
@@ -546,7 +548,7 @@ public class Creature {
      */
     private void initializeBrain(){
         int inputs = 12;
-        int outputs = 3;
+        int outputs = 4;
         int hiddenLayers = 2;
         int neuronsPerHiddenLayer = 3;
 
@@ -597,6 +599,15 @@ public class Creature {
 
     public void setFirstCreature(boolean firstCreature) {
         isFirstCreature = firstCreature;
+    }
+
+    public void setMovePower(double p){
+        this.movePower = p;
+    }
+
+    public void setRotatePower(double p){
+        //if(isFirstCreature())System.out.println("Rot Pow: " + p);
+        this.rotationPower = p;
     }
 
 

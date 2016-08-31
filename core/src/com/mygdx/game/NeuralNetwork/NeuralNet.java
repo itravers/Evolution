@@ -193,6 +193,9 @@ public class NeuralNet {
             }
             System.out.println();
         }*/
+
+
+        /*
         if(outputs.get(0) < 0.5f){
             owner.setThrustForwardPressed(false);
         }else{
@@ -209,6 +212,35 @@ public class NeuralNet {
             owner.setRotateRightPressed(false);
         }else{
             owner.setRotateRightPressed(true);
+        }
+        */
+
+        if(outputs.size() == 4){
+            //output 0
+            if(outputs.get(0) >= .5f){
+                owner.setThrustForwardPressed(true);
+            }else{
+                owner.setThrustForwardPressed(false);
+            }
+
+            //output1
+            double movePower = outputs.get(1);// -.5f;
+            double OUTPUT_MOVE_TO_POWER_SCALE = .0001;
+            movePower = movePower * OUTPUT_MOVE_TO_POWER_SCALE;
+            owner.setMovePower(movePower);
+
+            //output2
+            if(outputs.get(2) >= .5f){
+                owner.setRotatePressed(true);
+            }else{
+                owner.setRotatePressed(false);
+            }
+
+            //output 3 rotate power
+            double rotatePower = outputs.get(3) -.5f;
+            double OUTPUT_ROTATE_TO_POWER_SCALE = .000001f;
+            rotatePower = rotatePower * OUTPUT_ROTATE_TO_POWER_SCALE;
+            owner.setRotatePower(rotatePower);
         }
     }
 
