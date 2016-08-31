@@ -374,13 +374,12 @@ public class NeuralNet {
     }
 
     /**
-     * Create a new Neural network that is a combination of this neural network
+     * Create a new Chromosome that is a copy of two chromosomes
      * and another.
      * @param chrome2
      * @return
      */
-    public ArrayList<Double> crossOver(ArrayList<Double> chrome2){
-        ArrayList<Double> chrom1 = this.getWeights();
+    public static ArrayList<Double> crossOver(ArrayList<Double> chrome1, ArrayList<Double> chrome2){
         int chromoLength = chrome2.size();
 
         //create a random crossover point between 1 and chromoLength -1
@@ -393,7 +392,7 @@ public class NeuralNet {
         //copy the first part of chrom1, and the last part of chrom2 to newChrome
         for(int i = 0; i < chromoLength; i++){
             if(i <= crossOverPoint){
-                newChrome.add(chrom1.get(i));
+                newChrome.add(chrome1.get(i));
             }else{
                 newChrome.add(chrome2.get(i));
             }
@@ -406,7 +405,7 @@ public class NeuralNet {
     /**
      * mutates the weights in a given chromosome, decided by the mutate rate.
      */
-    public ArrayList<Double> mutate(ArrayList<Double>chromosome){
+    public static ArrayList<Double> mutate(ArrayList<Double>chromosome){
         ArrayList<Double>newChrome = new ArrayList<Double>((ArrayList<Double>)chromosome.clone());
         //step through chromosome
         for(int i = 0; i < chromosome.size(); i++){

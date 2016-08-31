@@ -12,4 +12,5 @@ public class Utils {
     public static int BRAIN_NEURONSPERLAYER = 6;
     public static float MUTATION_RATE = .1f;
     public static float MAX_PERTURBATION = 0.3f;
+    public static int FITTEST_CREATURES_TRACKED = 10;
 }

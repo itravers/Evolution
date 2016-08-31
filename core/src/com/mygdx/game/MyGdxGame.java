@@ -18,6 +18,8 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.game.NeuralNetwork.NeuralNet;
+import com.mygdx.game.NeuralNetwork.Utils;
 
 import java.util.ArrayList;
 
@@ -35,6 +37,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 	//Keep track of the NUM_FITTEST_GENOMES most fittest genomes that have lived.
 	ArrayList<ArrayList<Double>> listFittestGenomes;
+
+	//Maps to the listFittestGenomes, this is the data containing fitness
+	ArrayList<Double>listFittestValues;
 
 	final float PIXELS_TO_METERS = 100f;
 	float fps = 60f;
@@ -55,6 +60,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 		//setup fittest genome list
 		listFittestGenomes = new ArrayList<ArrayList<Double>>();
+		listFittestValues = new ArrayList<Double>();
 
 		createFood(10);
 		createCreatures(MINIMUM_POPULATION *3);
@@ -72,13 +78,28 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
-	private void addNewCreature(int creatureNum){
+	private void addNewCreature(int creatureNum, ArrayList<Double>g){
 		Vector2 size = new Vector2(5 , 10);
 		Vector2 position = new Vector2(getRandomPositionFromSize(size));
 		int generation = 0; //This is a 0th generation creature.
-		Creature c = new Creature(this, physicsWorld, position,  size, generation, creatureNum);
+		Creature c;
+		if(g == null){
+			c = new Creature(this, physicsWorld, position,  size, generation, creatureNum);
+		}else{
+			c = new Creature(this, physicsWorld, position,  size, generation, creatureNum, g);
+		}
+
 		//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 		creatures.add(c);
+
+		if(creatureNum == 0){
+			//on first creature, add it's genome to the fittestCreatureList FITTEST_CREATURES_TRACKED times
+			for(int i = 0; i < Utils.FITTEST_CREATURES_TRACKED; i++){
+				listFittestValues.add((double) c.fitness);
+				listFittestGenomes.add(c.neuralNet.getWeights());
+			}
+
+		}
 	}
 
 	private void createCreatures(int num){
@@ -86,7 +107,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		//create a single creature for testing
 
 		for(int i = 0; i < num; i++) {
-			addNewCreature(i);
+			addNewCreature(i, null);
 		}
 		//System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
 		//System.out.println("To2ndClosest: " + creatures.get(0).to2ndClosestCreature());
@@ -127,12 +148,55 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
-	
+	/**
+	 * Loop through characters alive.
+	 * Compare their fitness to the historically fit
+	 * if they are more fit, they displace the historically fit
+	 */
+	private void updateFittestList(){
+
+		//for each character alive
+		for(int i = 0; i < creatures.size(); i++){
+			Creature c = creatures.get(i);
+
+			//check if creatures fitness is more than something else on the list
+			for(int j = 0; j < listFittestValues.size(); j++){
+				if(c.fitness > listFittestValues.get(i)){
+					//put this characters genome and fitness values in place of the one in the list
+					listFittestGenomes.set(i, (ArrayList<Double>) c.neuralNet.getWeights().clone());
+					listFittestValues.set(i, (double) c.fitness);
+				}
+			}
+		}
+	}
 
 	private void ensureMinimumPopulation(){
 
 		if(creatures.size() < MINIMUM_POPULATION){
-			addNewCreature(creatures.size());
+			//roulette choose a genome from the listFittest
+			//roulette choose a creature's genome from creatures list, else if
+			//  if there are no creatures in list then:
+			        //roulette choose another genome from listFittest
+			//breed a new genome
+			//create a new creature with said genome
+
+			ArrayList<Double>g1;
+			ArrayList<Double>g2;
+			ArrayList<Double>newGenome;
+			//creatures is not empty, so we are going to choose genome 1 from them
+			if(!creatures.isEmpty()){
+				g1 = rouletteCopyGenomeFromCreaturesList();
+			}else{
+				//creatures is empty, so we are going to choose genome 1 from listFittest
+				g1 = rouletteCopyGenomeFromFittestList();
+			}
+
+			//always get genome 2 from fittestList
+			g2 = rouletteCopyGenomeFromFittestList();
+			newGenome = NeuralNet.crossOver(g1, g2);
+
+			//create a new creature from genome -1 as generation
+			addNewCreature(-1, newGenome);
 		}
 	}
 

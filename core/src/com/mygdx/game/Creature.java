@@ -263,7 +263,7 @@ public class Creature {
         //we can't create a new creature when called from the collision code (this is)
         //so we are going to set a flag, and in the render code, we will add the new creature
         if(this.getREFACTORY_TIME_LEFT() == 0 && otherCreature.getREFACTORY_TIME_LEFT() == 0){
-            ArrayList<Double> babyChrom = neuralNet.crossOver(otherCreature.neuralNet.getWeights());
+            ArrayList<Double> babyChrom = neuralNet.crossOver(neuralNet.getWeights(), otherCreature.neuralNet.getWeights());
            // babyChrom.mutate();
             babyChrom = neuralNet.mutate(babyChrom);
             pregnantChrome = babyChrom;
