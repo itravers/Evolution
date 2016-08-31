@@ -121,7 +121,7 @@ public class Food {
 
     public void update(){
         if(newPosition != null){
-            System.out.println("moving food to: " + newPosition.x + ":" + newPosition.y);
+          //  System.out.println("moving food to: " + newPosition.x + ":" + newPosition.y);
            setPos(newPosition);
             newPosition = null;
         }

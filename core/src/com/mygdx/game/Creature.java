@@ -34,10 +34,13 @@ public class Creature {
     private Vector2 size;
     private double movePower = 0;///.0005f;
     private double rotationPower = 0;///.0000015f;
+    private Vector2 previousPosition; //used to calculated totalMovement;
+    private float totalMovement = 0;
 
     //AI
     NeuralNet neuralNet;
-    float fitness = 0;
+    private float fitness = 0;
+    private int totalFoodEaten = 0;
 
 
 
@@ -48,7 +51,7 @@ public class Creature {
 
     //Collision Category
     public static final short CATEGORY = -1;
-    private static int REFACTORY_LIMIT = 5000; //seconds in refactory time.
+    private static int REFACTORY_LIMIT = Utils.REFACTORY_LIMIT;//5000; //seconds in refactory time.
     private float MAX_SPEED = .5f;
     private float MAX_ROTATION_SPEED = 10f;
 
@@ -70,8 +73,7 @@ public class Creature {
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen, int num){
         this.parent = parent;
         this.size = size;
-        this.generation = gen;
-
+        setGeneration(gen);
         setupPhysics(physicsWorld, position, size);
 
         //don't give a brain to the first one, I want to control it.
@@ -84,7 +86,7 @@ public class Creature {
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen, int num, ArrayList<Double>chromosome){
         this.parent = parent;
         this.size = size;
-        this.generation = gen;
+        setGeneration(gen);
 
         setupPhysics(physicsWorld, position, size);
 
@@ -119,9 +121,16 @@ public class Creature {
         fixture = body.createFixture(fixtureDef);
         body.setUserData(this);
         shape.dispose();
+
+        previousPosition = body.getPosition();
     }
 
     public void update(){
+        float dist = body.getPosition().sub(previousPosition).len2();
+        //if(totalMovement > 1)tot
+        totalMovement = totalMovement + dist;
+        previousPosition = new Vector2(body.getPosition());
+        //if(isFirstCreature())System.out.println("totalMovement dist: " + totalMovement+ " " +dist + " LIFE: " + LIFE_LEFT);
         if(neuralNet != null){
             neuralNet.update();
         }
@@ -244,11 +253,12 @@ public class Creature {
      * This Creature will eat the given food.
      */
     public void eat(Food f){
-        System.out.println("Creature has eaten food: " + f.getLIFE_VALUE());
+       // System.out.println("Creature has eaten food: " + f.getLIFE_VALUE());
         //First our LIFE_LEFT is incremented with the foods value
         LIFE_LEFT += f.getLIFE_VALUE();
+        totalFoodEaten += f.getLIFE_VALUE();
 
-        System.out.println("Creature has eaten food: " + f.getLIFE_VALUE() + " lifeLeft: " + LIFE_LEFT);
+        //System.out.println("Creature has eaten food: " + f.getLIFE_VALUE() + " lifeLeft: " + LIFE_LEFT);
         //reset the food.
         f.reset();
     }
@@ -370,8 +380,9 @@ public class Creature {
     }
 
     private void birthChild(){
-        System.out.println("THESE CREATURES HAVE MATED : " + parent.creatures.size() + " topFitness: " + parent.getHighestFitness());
-        System.out.println("GENERATION: " + generation);
+       // System.out.println("THESE CREATURES HAVE MATED : " + parent.creatures.size() + " topFitness: " + parent.getHighestFitness());
+       // System.out.println("birthChild() GENERATION: " + getGeneration());
+        System.out.println(" birthChild() GENERATION: " + getGeneration() + " AveragePopulationFitness: " + parent.getAverageFitness() + " bottomFitness " + parent.getLowestFitness()+ " topFitness: " + parent.getTopFitnessAlive() + " pop: " + parent.creatures.size());
         this.resetProcreationTimer();
         //otherCreature.resetProcreationTimer();
         this.incrementNumChildren();
@@ -382,7 +393,7 @@ public class Creature {
         //the new creature's generation will be the interger average of the parents + 1
        // int averageGeneration = ((this.generation + otherCreature.generation)/2)+1;
         //Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1, 1);
-        Creature c = new Creature(parent, parent.physicsWorld, position, size, generation+1, 1, pregnantChrome);
+        Creature c = new Creature(parent, parent.physicsWorld, position, size, getGeneration()+1, 1, pregnantChrome);
 
         //Creature c = new Creature(parent, pregnantChrome);
         //add new creature to game list
@@ -392,7 +403,7 @@ public class Creature {
         isPregnant = false;
 
         //mating is now good for you, make you live longer.
-        LIFE_LEFT += 10000;//each time you birth a child, you will life longer.
+        //LIFE_LEFT += 5000;//each time you birth a child, you will life longer.
 
     }
 
@@ -543,7 +554,7 @@ public class Creature {
 
     public void setPos(Vector2 p){
         body.setTransform((p.x - (Gdx.graphics.getWidth() /2) + size.x / 2)/parent.PIXELS_TO_METERS, (-p.y + (Gdx.graphics.getHeight() / 2 ) - size.y / 2)/parent.PIXELS_TO_METERS, body.getAngle());
-
+        previousPosition = body.getPosition();
     }
 
 
@@ -619,7 +630,8 @@ public class Creature {
     }
 
     public void calculateFitness(){
-        fitness = (TIME_LIVED / 1000) + (this.getNumChildren() * 30);
+        //add total movement here when it's calculated
+        fitness = (TIME_LIVED / 1000) + (this.getNumChildren() * 30)+(totalFoodEaten/(Utils.FOOD_LIMIT/2)) + (totalMovement*100);
     }
 
     public float getFitness(){
@@ -642,6 +654,14 @@ public class Creature {
     public void setRotatePower(double p){
         //if(isFirstCreature())System.out.println("Rot Pow: " + p);
         this.rotationPower = p;
+    }
+
+    public int getGeneration(){
+        return generation;
+    }
+
+    public void setGeneration(int g){
+        this.generation = g;
     }
 
 

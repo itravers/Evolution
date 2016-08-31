@@ -417,6 +417,7 @@ public class NeuralNet {
         for(int i = 0; i < chromosome.size(); i++){
             //do we mutate or not?
             if(MathUtils.random(0, 1.0f) < Utils.MUTATION_RATE ){
+               // System.out.print("Mutate Weight");
                 newChrome.set(i, chromosome.get(i)+(MathUtils.random(1.0f) * Utils.MAX_PERTURBATION));
             }else{
                 newChrome.set(i, chromosome.get(i));

@@ -41,6 +41,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	//Maps to the listFittestGenomes, this is the data containing fitness
 	ArrayList<Double>listFittestValues;
 
+	ArrayList<Integer>generationNumbers;
+
+	private int genNumFromFittestList = -9; //used to transfer generation number from stored genome to new creature
+
 	final float PIXELS_TO_METERS = 100f;
 	float fps = 60f;
 
@@ -61,9 +65,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		//setup fittest genome list
 		listFittestGenomes = new ArrayList<ArrayList<Double>>();
 		listFittestValues = new ArrayList<Double>();
+		generationNumbers = new ArrayList<Integer>();
 
 		createFood(Utils.START_FOOD);
-		createCreatures(MINIMUM_POPULATION *Utils.START_POPULATION_MULTIPLIER);
+		createCreatures(MINIMUM_POPULATION *Utils.START_POPULATION_MULTIPLIER, 0); //generation 0
 	}
 
 	private void createFood(int num){
@@ -78,40 +83,45 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
-	private void addNewCreature(int creatureNum, ArrayList<Double>g){
+	private void addNewCreature(int creatureNum, ArrayList<Double>g, int generation){
 		Vector2 size = new Vector2(5 , 10);
 		Vector2 position = new Vector2(getRandomPositionFromSize(size));
-		int generation = 0; //This is a 0th generation creature.
 		Creature c;
 		if(g == null){
-			c = new Creature(this, physicsWorld, position,  size, generation, creatureNum);
+			c = new Creature(this, physicsWorld, position,  size, generation+1, creatureNum);
 		}else{
-			c = new Creature(this, physicsWorld, position,  size, generation, creatureNum, g);
+			c = new Creature(this, physicsWorld, position,  size, generation+1, creatureNum, g);
 		}
+
+		System.out.print(" addNewCreature Generation: " + generation);
+		System.out.println(" AveragePopulationFitness: " + getAverageFitness() + " bottomFitness " + getLowestFitness()+ " topFitness: " + getTopFitnessAlive() + " pop: " + creatures.size());
+
 		//c.neuralNet.putWeights(g);
 		//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
 		creatures.add(c);
 
-		if(creatureNum == 0){
+		if(c.isFirstCreature()){
 			//on first creature, add it's genome to the fittestCreatureList FITTEST_CREATURES_TRACKED times
 			for(int i = 0; i < Utils.FITTEST_CREATURES_TRACKED; i++){
-				listFittestValues.add((double) c.fitness);
+				listFittestValues.add((double) c.getFitness());
 				listFittestGenomes.add(c.neuralNet.getWeights());
+				generationNumbers.add(c.getGeneration());
 			}
 
 		}
 	}
 
-	private void createCreatures(int num){
+	/**
+	 * creatun num random creatures of generation
+	 * @param num
+	 * @param generation
+     */
+	private void createCreatures(int num, int generation){
 		creatures = new ArrayList<Creature>();
-		//create a single creature for testing
 
 		for(int i = 0; i < num; i++) {
-			addNewCreature(i, null);
+			addNewCreature(i, null, generation);
 		}
-		//System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
-		//System.out.println("To2ndClosest: " + creatures.get(0).to2ndClosestCreature());
-		//System.out.println("ToClosestFood: " + creatures.get(0).toClosestFood());
 
 	}
 
@@ -161,10 +171,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 			//check if creatures fitness is more than something else on the list
 			for(int j = 0; j < listFittestValues.size(); j++){
-				if(c.fitness > listFittestValues.get(j)){
+				if(c.getFitness() > listFittestValues.get(j)){
 					//put this characters genome and fitness values in place of the one in the list
 					listFittestGenomes.set(j, (ArrayList<Double>) c.neuralNet.getWeights().clone());
-					listFittestValues.set(j, (double) c.fitness);
+					listFittestValues.set(j, (double) c.getFitness());
+					generationNumbers.set(j, c.getGeneration()+1);
 				}
 			}
 		}
@@ -210,7 +221,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			newGenome = NeuralNet.crossOver(g1, g2);
 
 			//create a new creature from genome -1 as generation
-			addNewCreature(-1, newGenome);
+			addNewCreature(-1, newGenome, genNumFromFittestList);
 		}
 	}
 
@@ -241,6 +252,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			//if the fitnessSoFar > Slice then return the chromosome corresponding with this value
 			if(fitnessSoFar >= slice){
 				chosenChromosome = listFittestGenomes.get(i);
+				genNumFromFittestList = generationNumbers.get(i);
 				break;
 			}
 		}
@@ -261,7 +273,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		//go through the chromosomes adding up the fitness so far
 		double fitnessSoFar = 0;
 		for(int i = 0; i < creatures.size(); i++){
-			fitnessSoFar += creatures.get(i).fitness;
+			fitnessSoFar += creatures.get(i).getFitness();
 
 			//if the fitnessSoFar > RandomNumberSlice then return chromosome thats here
 			if(fitnessSoFar >= slice){
@@ -278,8 +290,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		double fittest = 0;
 		ArrayList<Double>fittestChromosome = null;
 		for(int i = 0; i < creatures.size(); i++){
-			if(fittest <= creatures.get(i).fitness){
-				fittest = creatures.get(i).fitness;
+			if(fittest <= creatures.get(i).getFitness()){
+				fittest = creatures.get(i).getFitness();
 				fittestChromosome = creatures.get(i).neuralNet.getWeights();
 			}
 		}
@@ -287,15 +299,34 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	}
 
 	private Creature getLeastFittestCreature(){
-		double leastFitness = 100000;
+		double leastFitness = 1000000;
 		Creature c = null;
 		for(int i = 0; i < creatures.size(); i++){
-			if(creatures.get(i).fitness < leastFitness){
-				leastFitness = creatures.get(i).fitness;
+			if(creatures.get(i).getFitness() < leastFitness){
+				leastFitness = creatures.get(i).getFitness();
 				c = creatures.get(i);
 			}
 		}
 		return c;
+	}
+
+	public double getLowestFitness(){
+		double leastFitness = 1000000;
+		for(int i = 0; i < creatures.size(); i++){
+			if(creatures.get(i).getFitness() < leastFitness){
+				leastFitness = creatures.get(i).getFitness();
+			}
+		}
+		return leastFitness;
+	}
+
+	public double getAverageFitness(){
+		int numCreatures = creatures.size();
+		float totFitness = 0;
+		for(int i = 0; i < numCreatures; i++){
+			totFitness += creatures.get(i).getFitness();
+		}
+		return (totFitness/numCreatures);
 	}
 
 	public double getHighestFitness(){
@@ -305,7 +336,17 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 				fit = listFittestValues.get(i);
 			}
 		}
-		System.out.println("Highest Fitness: " + fit);
+		//System.out.println("Highest Fitness: " + fit);
+		return fit;
+	}
+
+	public double getTopFitnessAlive(){
+		double fit = 0;
+		for(int i = 0; i < creatures.size(); i++){
+			if(creatures.get(i).getFitness() > fit){
+				fit = creatures.get(i).getFitness();
+			}
+		}
 		return fit;
 	}
 
