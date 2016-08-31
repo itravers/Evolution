@@ -33,10 +33,14 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	ArrayList<Creature> creatures;
 	ArrayList<Food> foods;
 
+	//Keep track of the NUM_FITTEST_GENOMES most fittest genomes that have lived.
+	ArrayList<ArrayList<Double>> listFittestGenomes;
+
 	final float PIXELS_TO_METERS = 100f;
 	float fps = 60f;
 
-	int MINIMUM_POPULATION = 5;
+	int MINIMUM_POPULATION = 27; //When population is less than this, a new creature is auto bred.
+	int MAXIMUM_POPULATION = 250; //when population exceeds this, a lesser fit creature is killed.
 	
 	@Override
 	public void create () {
@@ -48,8 +52,12 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
-		createFood(2);
-		createCreatures(100);
+
+		//setup fittest genome list
+		listFittestGenomes = new ArrayList<ArrayList<Double>>();
+
+		createFood(10);
+		createCreatures(MINIMUM_POPULATION *3);
 	}
 
 	private void createFood(int num){
@@ -110,14 +118,19 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	}
 
 	private void updateCreatures(){
+		updateFittestList();
 		ensureMinimumPopulation();
+		ensureMaximumPopulation();
 
 		for(int i = 0; i < creatures.size(); i++){
 			creatures.get(i).update();
 		}
 	}
 
+	
+
 	private void ensureMinimumPopulation(){
+
 		if(creatures.size() < MINIMUM_POPULATION){
 			addNewCreature(creatures.size());
 		}

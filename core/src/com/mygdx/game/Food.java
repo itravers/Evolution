@@ -30,7 +30,7 @@ public class Food {
     public static final short CATEGORY = -2;
 
 
-    public static float LIMIT = 10000; //The largest food possible.
+    public static float LIMIT = 60000; //The largest food possible.
     private float LIFE_VALUE;
 
     public Food(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, float value){

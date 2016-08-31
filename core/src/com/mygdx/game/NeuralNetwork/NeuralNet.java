@@ -2,6 +2,7 @@ package com.mygdx.game.NeuralNetwork;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Creature;
 import com.mygdx.game.Food;
 
@@ -26,22 +27,26 @@ public class NeuralNet {
 
     /**
      * Constructor
-     * @param nInputs
-     * @param nOutputs
-     * @param nHiddenLayers
-     * @param nerPerHiddenLayer
+     * @param owner
      */
-    public NeuralNet(Creature owner, int nInputs, int nOutputs, int nHiddenLayers, int nerPerHiddenLayer){
+    public NeuralNet(Creature owner){
         this.owner = owner;
-        numInputs = nInputs;
-        numOutputs = nOutputs;
-        numHiddenLayers = nHiddenLayers;
-        neuronsPerHiddenLayer = nerPerHiddenLayer;
+        numInputs = Utils.BRAIN_INPUTs;;
+        numOutputs = Utils.BRAIN_OUTPUTS;
+        numHiddenLayers =  Utils.BRAIN_HIDDENLAYERS;
+        neuronsPerHiddenLayer = Utils.BRAIN_NEURONSPERLAYER;
         listLayers = new ArrayList<NeuronLayer>();
         listInputs = new ArrayList<Double>();
         createNet();
-
     }
+
+
+    /**
+     * Build a neural network, but instead of using random weights
+     * use the weights in chromosome.
+     */
+
+
 
 //public methods
 
@@ -162,7 +167,12 @@ public class NeuralNet {
 
     public void update(){
         //update the inputs
-        updateInputs();
+        try{
+            updateInputs();
+        }catch(IndexOutOfBoundsException e){
+            System.out.println("update inputs out of bounds exceptions " + e);
+        }
+
         if(owner.isFirstCreature()){
            // debugNet();
         }
@@ -265,7 +275,7 @@ public class NeuralNet {
         //First check that we have a good amount of inputs
         if(inputsList.size() != numInputs){
             //return an emtpy vector
-            System.out.println("updating neural network: input Num not correct");
+            System.out.println("updating neural network: input Num not correct + " + inputsList.size() + " vs " + numInputs);
             return outputs;
         }
 
@@ -361,6 +371,56 @@ public class NeuralNet {
         listInputs.set(10, (double)owner.getLIFE_LEFT());
         listInputs.set(11, (double)owner.getREFACTORY_TIME_LEFT());
 
+    }
+
+    /**
+     * Create a new Neural network that is a combination of this neural network
+     * and another.
+     * @param chrome2
+     * @return
+     */
+    public ArrayList<Double> crossOver(ArrayList<Double> chrome2){
+        ArrayList<Double> chrom1 = this.getWeights();
+        int chromoLength = chrome2.size();
+
+        //create a random crossover point between 1 and chromoLength -1
+        //this way we don't ever keep the entire chromosome.
+        int crossOverPoint = MathUtils.random(1, chromoLength-1);
+
+        //create a new empty chromosome
+        ArrayList<Double> newChrome = new ArrayList<Double>();
+
+        //copy the first part of chrom1, and the last part of chrom2 to newChrome
+        for(int i = 0; i < chromoLength; i++){
+            if(i <= crossOverPoint){
+                newChrome.add(chrom1.get(i));
+            }else{
+                newChrome.add(chrome2.get(i));
+            }
+        }
+
+        //return a new neural network created from the new chromosome
+        return newChrome;
+    }
+
+    /**
+     * mutates the weights in a given chromosome, decided by the mutate rate.
+     */
+    public ArrayList<Double> mutate(ArrayList<Double>chromosome){
+        ArrayList<Double>newChrome = new ArrayList<Double>((ArrayList<Double>)chromosome.clone());
+        //step through chromosome
+        for(int i = 0; i < chromosome.size(); i++){
+            //do we mutate or not?
+            if(MathUtils.random(0, 1.0f) < Utils.MUTATION_RATE ){
+                newChrome.set(i, chromosome.get(i)+(MathUtils.random(1.0f) * Utils.MAX_PERTURBATION));
+            }else{
+                newChrome.set(i, chromosome.get(i));
+            }
+        }
+
+
+
+        return newChrome;
     }
 
 

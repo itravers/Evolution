@@ -3,7 +3,12 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.NeuralNetwork.NeuralNet;
+import com.mygdx.game.NeuralNetwork.Utils;
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+
+import java.util.ArrayList;
 
 /**
  * Created by Isaac Assegai on 8/29/16.
@@ -60,6 +65,7 @@ public class Creature {
 
     private int generation; //Used by genetic algorithm to track which generation this is in.
     private boolean isPregnant = false; //used to check if we need to birth a child next update.
+    private ArrayList<Double> pregnantChrome; //Used to birth children.
 
     public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen, int num){
         this.parent = parent;
@@ -71,8 +77,21 @@ public class Creature {
         //don't give a brain to the first one, I want to control it.
 
         if(num == 0)isFirstCreature = true;
-        initializeBrain();
+        initializeEmptyBrain();
 
+    }
+
+    public Creature(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, int gen, int num, ArrayList<Double>chromosome){
+        this.parent = parent;
+        this.size = size;
+        this.generation = gen;
+
+        setupPhysics(physicsWorld, position, size);
+
+        //don't give a brain to the first one, I want to control it.
+
+        if(num == 0)isFirstCreature = true;
+        initializeFullBrain(chromosome);
     }
 
     private void setupPhysics(World physicsWorld, Vector2 position, Vector2 size){
@@ -244,7 +263,11 @@ public class Creature {
         //we can't create a new creature when called from the collision code (this is)
         //so we are going to set a flag, and in the render code, we will add the new creature
         if(this.getREFACTORY_TIME_LEFT() == 0 && otherCreature.getREFACTORY_TIME_LEFT() == 0){
-           isPregnant = true;
+            ArrayList<Double> babyChrom = neuralNet.crossOver(otherCreature.neuralNet.getWeights());
+           // babyChrom.mutate();
+            babyChrom = neuralNet.mutate(babyChrom);
+            pregnantChrome = babyChrom;
+            isPregnant = true;
         }
 
     }
@@ -347,7 +370,7 @@ public class Creature {
     }
 
     private void birthChild(){
-        System.out.println("THESE CREATURES HAVE MATED");
+        System.out.println("THESE CREATURES HAVE MATED : " + parent.creatures.size());
         this.resetProcreationTimer();
         //otherCreature.resetProcreationTimer();
         this.incrementNumChildren();
@@ -357,10 +380,18 @@ public class Creature {
         Vector2 position = new Vector2(getPos());
         //the new creature's generation will be the interger average of the parents + 1
        // int averageGeneration = ((this.generation + otherCreature.generation)/2)+1;
-        Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1, 1);
+        //Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1, 1);
+        Creature c = new Creature(parent, parent.physicsWorld, position, size, generation+1, 1, pregnantChrome);
+
+        //Creature c = new Creature(parent, pregnantChrome);
         //add new creature to game list
         parent.creatures.add(c);
+
+        pregnantChrome = null;
         isPregnant = false;
+
+        //mating is now good for you, make you live longer.
+        LIFE_LEFT += 10000;//each time you birth a child, you will life longer.
 
     }
 
@@ -475,7 +506,8 @@ public class Creature {
     /**
      * Create a new creature and remove this one
      */
-    private void procreateASexually(){
+
+    /*private void procreateASexually(){
         this.REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
         this.LIFE_LEFT = LIFE_SPAN;
         numChildren = 0;
@@ -485,7 +517,7 @@ public class Creature {
         //this.body.setTransform(newPos, this.body.getAngle());
        // this.
        // System.out.println("time out, havn't procreated, a-sexually procreate @ " + newPos);
-    }
+    }*/
 
     private boolean hasProcreated(){
         boolean returnVal = false;
@@ -534,8 +566,10 @@ public class Creature {
         }
     }
 
-    private void replaceBrain(){
-
+    private void initializeFullBrain(ArrayList<Double>chromosome){
+        neuralNet = new NeuralNet(this);
+        neuralNet.putWeights(chromosome);
+        initializeInputs();
     }
 
     /**
@@ -543,14 +577,15 @@ public class Creature {
      * Hook up inputs
      * Hook up outputs
      */
-    private void initializeBrain(){
-        int inputs = 12;
-        int outputs = 4;
-        int hiddenLayers = 2;
-        int neuronsPerHiddenLayer = 3;
+    private void initializeEmptyBrain(){
 
-        neuralNet = new NeuralNet(this, inputs,outputs,hiddenLayers,neuronsPerHiddenLayer);
 
+        neuralNet = new NeuralNet(this);
+
+        initializeInputs();
+    }
+
+    private void initializeInputs(){
         //hookup inputs keep this synched with updateInputs in nn
         Vector2 toClosestCreature = getVectorToClosestCreature();
         Creature closestCreature = getClosestCreature();
