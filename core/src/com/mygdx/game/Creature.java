@@ -483,7 +483,7 @@ public class Creature {
      *
      * If it has had children it will be removed, dereferenced and left to the garabage collector
      */
-    private void kill(){
+    public void kill(){
         LIFE_LEFT = 0;
             //System.out.println("time out, have procreated, do kill");
             parent.physicsWorld.destroyBody(this.body);

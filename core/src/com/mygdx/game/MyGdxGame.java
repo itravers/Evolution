@@ -170,6 +170,18 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
+	/**
+	 * If the population is too high, roullete kill one of the least fittest
+	 * in the creatures list
+	 */
+	private void ensureMaximumPopulation(){
+		if(creatures.size() >= MAXIMUM_POPULATION){
+			//Creature c = rouletteChooseLeastFittestChar();
+			Creature c = getLeastFittestCreature();
+			c.kill();
+		}
+	}
+
 	private void ensureMinimumPopulation(){
 
 		if(creatures.size() < MINIMUM_POPULATION){
@@ -199,6 +211,14 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			addNewCreature(-1, newGenome);
 		}
 	}
+
+	/**
+	 * Find a less fit individual from the creatures list, return it
+	 * @return
+     */
+	//private Creature rouletteChooseLeastFittestChar(){
+
+	//}
 
 	/**
 	 * Copy a genome from the fittest list, based on roulette probability
@@ -248,6 +268,18 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			}
 		}
 		return (ArrayList<Double>) chosenChromosome.clone();
+	}
+
+	private Creature getLeastFittestCreature(){
+		double leastFitness = 100000;
+		Creature c = null;
+		for(int i = 0; i < creatures.size(); i++){
+			if(creatures.get(i).fitness < leastFitness){
+				leastFitness = creatures.get(i).fitness;
+				c = creatures.get(i);
+			}
+		}
+		return c;
 	}
 
 	private double getHighestFitness(){
