@@ -393,7 +393,12 @@ public class NeuralNet {
         //copy the first part of chrom1, and the last part of chrom2 to newChrome
         for(int i = 0; i < chromoLength; i++){
             if(i <= crossOverPoint){
-                newChrome.add(chrome1.get(i));
+                try{
+                    newChrome.add(chrome1.get(i));
+                }catch(IndexOutOfBoundsException e){
+                    System.err.println(e);
+                }
+
             }else{
                 newChrome.add(chrome2.get(i));
             }

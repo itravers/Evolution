@@ -198,9 +198,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			//creatures is not empty, so we are going to choose genome 1 from them
 			if(!creatures.isEmpty()){
 				g1 = rouletteCopyGenomeFromCreaturesList();
+				int i = 0;
 			}else{
 				//creatures is empty, so we are going to choose genome 1 from listFittest
 				g1 = rouletteCopyGenomeFromFittestList();
+				int i = 0;
 			}
 
 			//always get genome 2 from fittestList
@@ -265,9 +267,23 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			if(fitnessSoFar >= slice){
 				chosenChromosome = creatures.get(i).neuralNet.getWeights();
 				break;
+			}else{
+				chosenChromosome = getFittestChromosomeFromCreature();
 			}
 		}
 		return (ArrayList<Double>) chosenChromosome.clone();
+	}
+
+	private ArrayList<Double>getFittestChromosomeFromCreature(){
+		double fittest = 0;
+		ArrayList<Double>fittestChromosome = null;
+		for(int i = 0; i < creatures.size(); i++){
+			if(fittest <= creatures.get(i).fitness){
+				fittest = creatures.get(i).fitness;
+				fittestChromosome = creatures.get(i).neuralNet.getWeights();
+			}
+		}
+		return fittestChromosome;
 	}
 
 	private Creature getLeastFittestCreature(){
@@ -282,7 +298,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		return c;
 	}
 
-	private double getHighestFitness(){
+	public double getHighestFitness(){
 		double fit = 0;
 		for(int i = 0; i < listFittestValues.size(); i++){
 			if (listFittestValues.get(i) > fit){

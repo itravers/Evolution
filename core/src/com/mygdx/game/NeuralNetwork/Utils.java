@@ -13,10 +13,10 @@ public class Utils {
     public static float MUTATION_RATE = .1f;
     public static float MAX_PERTURBATION = 0.3f;
     public static int FITTEST_CREATURES_TRACKED = 10;
-    public static int LIFE_SPAN = 10000;
-    public static int START_POPULATION_MULTIPLIER = 1;
-    public static int MINIMUM_POPULATION = 50;
-    public static int MAXIMUM_POPULATION = 150;
-    public static int START_FOOD = 12;
+    public static int LIFE_SPAN = 20000;
+    public static int START_POPULATION_MULTIPLIER = 2;
+    public static int MINIMUM_POPULATION = 25;
+    public static int MAXIMUM_POPULATION = 120;
+    public static int START_FOOD = 15;
     public static float FOOD_LIMIT = 10000;
 }

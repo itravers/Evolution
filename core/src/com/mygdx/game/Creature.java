@@ -370,7 +370,8 @@ public class Creature {
     }
 
     private void birthChild(){
-        System.out.println("THESE CREATURES HAVE MATED : " + parent.creatures.size());
+        System.out.println("THESE CREATURES HAVE MATED : " + parent.creatures.size() + " topFitness: " + parent.getHighestFitness());
+        System.out.println("GENERATION: " + generation);
         this.resetProcreationTimer();
         //otherCreature.resetProcreationTimer();
         this.incrementNumChildren();
