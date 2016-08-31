@@ -164,8 +164,17 @@ public class NeuralNet {
         //update the inputs
         updateInputs();
         if(owner.isFirstCreature()){
-            debugNet();
+           // debugNet();
         }
+
+       /* if(owner.isFirstCreature()){
+            //list outputs
+            System.out.println();
+            for(int i = 0; i < listInputs.size(); i ++){
+                System.out.format("    listInputs: "+i+": %.4f", listInputs.get(i));
+            }
+
+        }*/
 
         //update neural network with a copy of the updated inputs
 
@@ -176,15 +185,14 @@ public class NeuralNet {
 
 
         //wire outputs[0] to thrust forward
-        if(owner.isFirstCreature()){
+       /* if(owner.isFirstCreature()){
             //list outputs
-           // for(int i = 0; i < outputs.size(); i ++){
-            //    System.out.println("Outputs: " + i + " " + outputs.get(i));
-           // }
-            //System.out.print(" out [ ");
-           // System.out.format(" A:%.2f B:%.2f C:%.2f ", outputs.get(0), outputs.get(1), outputs.get(2));
-
-        }
+            System.out.println();
+            for(int i = 0; i < outputs.size(); i ++){
+                System.out.format("    Outputs: "+i+": %.4f", outputs.get(i));
+            }
+            System.out.println();
+        }*/
         if(outputs.get(0) < 0.5f){
             owner.setThrustForwardPressed(false);
         }else{
