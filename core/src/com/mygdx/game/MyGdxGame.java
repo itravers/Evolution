@@ -200,6 +200,31 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
+	/**
+	 * Copy a genome from creatures list, based on roulette probablity.
+	 * @return a copy of the genome
+     */
+	private ArrayList<Double> rouletteCopyGenomeFromCreaturesList(){
+		//generate a random number between 0 and the highest fitness count
+		float slice = MathUtils.random(0, (float)getHighestFitness());
+
+		//this will be set to the chosen chromosome
+		ArrayList<Double>chosenChromosome = new ArrayList<Double>();
+
+		//go through the chromosomes adding up the fitness so far
+		double fitnessSoFar = 0;
+		for(int i = 0; i < creatures.size(); i++){
+			fitnessSoFar += creatures.get(i).fitness;
+
+			//if the fitnessSoFar > RandomNumberSlice then return chromosome thats here
+			if(fitnessSoFar >= slice){
+				chosenChromosome = creatures.get(i).neuralNet.getWeights();
+				break;
+			}
+		}
+		return chosenChromosome;
+	}
+
 	private double getHighestFitness(){
 		double fit = 0;
 		for(int i = 0; i < listFittestValues.size(); i++){
