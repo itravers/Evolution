@@ -49,6 +49,7 @@ public class Creature {
 
     private int LIFE_SPAN = 20000; //in milliseconds
     private int LIFE_LEFT = LIFE_SPAN;
+    private long TIME_LIVED = 0;
 
 
     private int REFACTORY_TIME_LEFT = REFACTORY_LIMIT;
@@ -124,7 +125,7 @@ public class Creature {
         if(isRotatePressed()){
            // if(isFirstCreature())System.out.println("body.getAngularVelocity(): " + rotationPower + "  MAX_ROTATION_SPEED: " + MAX_ROTATION_SPEED);
             if(Math.abs(body.getAngularVelocity()) <= MAX_ROTATION_SPEED){
-                if(isFirstCreature())System.out.println("Rotate: " + rotationPower);
+               // if(isFirstCreature())System.out.println("Rotate: " + rotationPower);
                 body.applyAngularImpulse((float) rotationPower, true);
             }
         }
@@ -157,6 +158,7 @@ public class Creature {
         //if((REFACTORY_TIME_LEFT > 4900 && REFACTORY_TIME_LEFT <= 5000) || (REFACTORY_TIME_LEFT > 0 && REFACTORY_TIME_LEFT <= 5))System.out.println("REFACTORY TIME LEFT: " + REFACTORY_TIME_LEFT);
 
 
+        TIME_LIVED += elapsedTime;
         LIFE_LEFT -= elapsedTime;
         if(LIFE_LEFT <= 0){
             kill();
@@ -452,15 +454,10 @@ public class Creature {
      */
     private void kill(){
         LIFE_LEFT = 0;
-        if(hasProcreated()){
             //System.out.println("time out, have procreated, do kill");
             parent.physicsWorld.destroyBody(this.body);
             parent.creatures.remove(this);
-        }else{
 
-
-            procreateASexually();
-        }
     }
 
     /**
@@ -586,10 +583,11 @@ public class Creature {
     }
 
     public void calculateFitness(){
-        fitness = 0;
+        fitness = (TIME_LIVED / 1000) + (this.getNumChildren() * 30);
     }
 
     public float getFitness(){
+        calculateFitness();
         return fitness;
     }
 

@@ -35,6 +35,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 	final float PIXELS_TO_METERS = 100f;
 	float fps = 60f;
+
+	int MINIMUM_POPULATION = 5;
 	
 	@Override
 	public void create () {
@@ -47,8 +49,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		img = new Texture("badlogic.jpg");
 		Gdx.input.setInputProcessor(this);
 		createFood(2);
-		createCreatures(20);
-
+		createCreatures(100);
 	}
 
 	private void createFood(int num){
@@ -63,17 +64,21 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
+	private void addNewCreature(int creatureNum){
+		Vector2 size = new Vector2(5 , 10);
+		Vector2 position = new Vector2(getRandomPositionFromSize(size));
+		int generation = 0; //This is a 0th generation creature.
+		Creature c = new Creature(this, physicsWorld, position,  size, generation, creatureNum);
+		//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
+		creatures.add(c);
+	}
+
 	private void createCreatures(int num){
 		creatures = new ArrayList<Creature>();
 		//create a single creature for testing
 
 		for(int i = 0; i < num; i++) {
-			Vector2 size = new Vector2(5 , 10);
-			Vector2 position = new Vector2(getRandomPositionFromSize(size));
-			int generation = 0; //This is a 0th generation creature.
-			Creature c = new Creature(this, physicsWorld, position,  size, generation, i);
-			//System.out.println("CPOS: " + (int)c.getPos().x + ":" + c.getPos().y);
-			creatures.add(c);
+			addNewCreature(i);
 		}
 		//System.out.println("ToClosest: " + creatures.get(0).toClosestCreature());
 		//System.out.println("To2ndClosest: " + creatures.get(0).to2ndClosestCreature());
@@ -105,8 +110,16 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	}
 
 	private void updateCreatures(){
+		ensureMinimumPopulation();
+
 		for(int i = 0; i < creatures.size(); i++){
 			creatures.get(i).update();
+		}
+	}
+
+	private void ensureMinimumPopulation(){
+		if(creatures.size() < MINIMUM_POPULATION){
+			addNewCreature(creatures.size());
 		}
 	}
 
