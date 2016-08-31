@@ -200,6 +200,16 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		}
 	}
 
+	private double getHighestFitness(){
+		double fit = 0;
+		for(int i = 0; i < listFittestValues.size(); i++){
+			if (listFittestValues.get(i) > fit){
+				fit = listFittestValues.get(i);
+			}
+		}
+		return fit;
+	}
+
 	private void updateFood(){
 		for(int i = 0; i < foods.size(); i++){
 			foods.get(i).update();
