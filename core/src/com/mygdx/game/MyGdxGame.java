@@ -44,8 +44,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	final float PIXELS_TO_METERS = 100f;
 	float fps = 60f;
 
-	int MINIMUM_POPULATION = 27; //When population is less than this, a new creature is auto bred.
-	int MAXIMUM_POPULATION = 250; //when population exceeds this, a lesser fit creature is killed.
+	int MINIMUM_POPULATION = Utils.MINIMUM_POPULATION; //When population is less than this, a new creature is auto bred.
+	int MAXIMUM_POPULATION = Utils.MAXIMUM_POPULATION; //when population exceeds this, a lesser fit creature is killed.
 	
 	@Override
 	public void create () {
@@ -62,8 +62,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		listFittestGenomes = new ArrayList<ArrayList<Double>>();
 		listFittestValues = new ArrayList<Double>();
 
-		createFood(10);
-		createCreatures(MINIMUM_POPULATION *3);
+		createFood(Utils.START_FOOD);
+		createCreatures(MINIMUM_POPULATION *Utils.START_POPULATION_MULTIPLIER);
 	}
 
 	private void createFood(int num){
@@ -289,6 +289,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 				fit = listFittestValues.get(i);
 			}
 		}
+		System.out.println("Highest Fitness: " + fit);
 		return fit;
 	}
 

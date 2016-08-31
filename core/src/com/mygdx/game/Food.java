@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.game.NeuralNetwork.Utils;
 
 /**
  * Created by Isaac Assegai on 8/29/16.
@@ -30,7 +31,7 @@ public class Food {
     public static final short CATEGORY = -2;
 
 
-    public static float LIMIT = 60000; //The largest food possible.
+    public static float LIMIT = Utils.FOOD_LIMIT; //The largest food possible.
     private float LIFE_VALUE;
 
     public Food(MyGdxGame parent, World physicsWorld, Vector2 position, Vector2 size, float value){

@@ -52,7 +52,7 @@ public class Creature {
     private float MAX_SPEED = .5f;
     private float MAX_ROTATION_SPEED = 10f;
 
-    private int LIFE_SPAN = 20000; //in milliseconds
+    private int LIFE_SPAN = Utils.LIFE_SPAN;
     private int LIFE_LEFT = LIFE_SPAN;
     private long TIME_LIVED = 0;
 
