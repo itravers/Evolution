@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.NeuralNetwork.NeuralNet;
 import com.mygdx.game.NeuralNetwork.Utils;
 
@@ -35,6 +36,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	ArrayList<Creature> creatures;
 	ArrayList<Food> foods;
 
+	int quickTimes = Utils.QUICKTIME;//used to render faster
+
 	//Keep track of the NUM_FITTEST_GENOMES most fittest genomes that have lived.
 	ArrayList<ArrayList<Double>> listFittestGenomes;
 
@@ -46,7 +49,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	private int genNumFromFittestList = -9; //used to transfer generation number from stored genome to new creature
 
 	final float PIXELS_TO_METERS = 100f;
-	float fps = 60f;
+
 
 	int MINIMUM_POPULATION = Utils.MINIMUM_POPULATION; //When population is less than this, a new creature is auto bred.
 	int MAXIMUM_POPULATION = Utils.MAXIMUM_POPULATION; //when population exceeds this, a lesser fit creature is killed.
@@ -130,7 +133,18 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		camera.update();
 		updateCreatures();
 		updateFood();
+
+
+		float fps = Utils.FPS;
+		//int quicktime = Utils.QUICKTIME+1;
+
 		physicsWorld.step(1f/fps,6, 2);
+		//physicsWorld.ste
+
+
+		//for(int i = 0; i < quickTimes-1; i++){
+		//	physicsWorld.step(1f/(fps), 24, 8);
+		//}
 
 
 
@@ -175,7 +189,14 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 					//put this characters genome and fitness values in place of the one in the list
 					listFittestGenomes.set(j, (ArrayList<Double>) c.neuralNet.getWeights().clone());
 					listFittestValues.set(j, (double) c.getFitness());
+					//generationNumbers.s
 					generationNumbers.set(j, c.getGeneration()+1);
+
+					/*
+					listFittestGenomes.add((ArrayList<Double>)c.neuralNet.getWeights().clone());
+					listFittestValues.add((double)c.getFitness());
+					generationNumbers.add(c.getGeneration());
+				*/
 				}
 			}
 		}
@@ -186,7 +207,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	 * in the creatures list
 	 */
 	private void ensureMaximumPopulation(){
-		if(creatures.size() >= MAXIMUM_POPULATION){
+		int maxPop = MAXIMUM_POPULATION;
+		if(creatures.size() >= maxPop){
 			//Creature c = rouletteChooseLeastFittestChar();
 			Creature c = getLeastFittestCreature();
 			c.kill();
@@ -212,12 +234,16 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 				int i = 0;
 			}else{
 				//creatures is empty, so we are going to choose genome 1 from listFittest
-				g1 = rouletteCopyGenomeFromFittestList();
+				//g1 = rouletteCopyGenomeFromFittestList();
+				g1 = rouletteCopyGenomeFromCreaturesList();
 				int i = 0;
 			}
 
 			//always get genome 2 from fittestList
-			g2 = rouletteCopyGenomeFromFittestList();
+			//g2 = rouletteCopyGenomeFromFittestList();
+
+			g2 = rouletteCopyGenomeFromCreaturesList();
+			//System.out.println("g2 fitness")
 			newGenome = NeuralNet.crossOver(g1, g2);
 
 			//create a new creature from genome -1 as generation
@@ -239,7 +265,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
      */
 	private ArrayList<Double> rouletteCopyGenomeFromFittestList(){
 		//generate a random number between 0 and the highest fitness count
-		float slice = MathUtils.random(0, (float)getHighestFitness());
+
+		/*float slice = MathUtils.random(0, (float)getHighestFitness());
 
 		//this will be set to the chosen chromosome
 		ArrayList<Double>chosenChromosome = new ArrayList<Double>();
@@ -257,6 +284,13 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 			}
 		}
 		return (ArrayList<Double>)chosenChromosome.clone();
+		*/
+
+		//get random genome from fittestGenomes
+		int index = MathUtils.random(0, listFittestGenomes.size()-1);
+		ArrayList<Double>chosenChromosome = listFittestGenomes.get(index);
+		genNumFromFittestList = generationNumbers.get(index);
+		return chosenChromosome;
 	}
 
 	/**
@@ -281,18 +315,40 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 				break;
 			}else{
 				chosenChromosome = getFittestChromosomeFromCreature();
+				break;
 			}
 		}
 		return (ArrayList<Double>) chosenChromosome.clone();
 	}
 
 	private ArrayList<Double>getFittestChromosomeFromCreature(){
-		double fittest = 0;
 		ArrayList<Double>fittestChromosome = null;
+
+		//one out of every 20 times, lets choose a random Creature
+		if(MathUtils.randomBoolean(.04f)){
+			/*System.out.println("getFittestChromFromCreature RANDOMLY");
+			int index = MathUtils.random(0, creatures.size()-1);
+			genNumFromFittestList = creatures.get(index).getGeneration();
+			return creatures.get(MathUtils.random(0, index)).neuralNet.getWeights();*/
+			System.out.println("getFittestChromFromCreature RANDOMLY");
+			//create a new random creature, and get it's neural net
+			Vector2 size = new Vector2(5 , 10);
+			Vector2 position = new Vector2(0,0);
+			//the new creature's generation will be the interger average of the parents + 1
+			// int averageGeneration = ((this.generation + otherCreature.generation)/2)+1;
+			//Creature c = new Creature(parent, parent.physicsWorld, position,  size, generation+1, 1);
+			Creature c = new Creature(this, this.physicsWorld, position, size, 0, 1);
+			//genNumFromFittestList = 0;
+			return c.neuralNet.getWeights();
+
+		}
+		double fittest = 0;
+
 		for(int i = 0; i < creatures.size(); i++){
 			if(fittest <= creatures.get(i).getFitness()){
 				fittest = creatures.get(i).getFitness();
 				fittestChromosome = creatures.get(i).neuralNet.getWeights();
+				genNumFromFittestList = creatures.get(i).getGeneration();
 			}
 		}
 		return fittestChromosome;
@@ -506,6 +562,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	}
 
 	public float getRandomFoodValue(){
-		return MathUtils.random(Food.LIMIT);
+		float limit = Food.LIMIT;
+		return MathUtils.random(limit);
 	}
 }

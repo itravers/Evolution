@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
@@ -122,6 +123,7 @@ public class Creature {
         body.setUserData(this);
         shape.dispose();
 
+        body.setTransform(body.getPosition(), MathUtils.random(360));
         previousPosition = body.getPosition();
     }
 
@@ -170,7 +172,7 @@ public class Creature {
             }
         }8*/
 
-        float time = 1000/parent.fps;
+        float time = 1000/Utils.FPS;
         int elapsedTime = (int)(time * 1);
         // System.out.println("ElapsedTime" + elapsedTime);
 
@@ -382,7 +384,7 @@ public class Creature {
     private void birthChild(){
        // System.out.println("THESE CREATURES HAVE MATED : " + parent.creatures.size() + " topFitness: " + parent.getHighestFitness());
        // System.out.println("birthChild() GENERATION: " + getGeneration());
-        System.out.println(" birthChild() GENERATION: " + getGeneration() + " AveragePopulationFitness: " + parent.getAverageFitness() + " bottomFitness " + parent.getLowestFitness()+ " topFitness: " + parent.getTopFitnessAlive() + " pop: " + parent.creatures.size());
+        System.out.println(" birthChild() GENERATION: " + getGeneration() + "   HIGHESTFITNESSEVER: " + parent.getHighestFitness() + "   AveragePopulationFitness: " + parent.getAverageFitness() + "   bottomFitness " + parent.getLowestFitness()+ "   topFitness: " + parent.getTopFitnessAlive() + "   pop: " + parent.creatures.size());
         this.resetProcreationTimer();
         //otherCreature.resetProcreationTimer();
         this.incrementNumChildren();
@@ -499,7 +501,9 @@ public class Creature {
         LIFE_LEFT = 0;
             //System.out.println("time out, have procreated, do kill");
             parent.physicsWorld.destroyBody(this.body);
+            this.TIME_LIVED = 0;
             parent.creatures.remove(this);
+
 
     }
 
@@ -631,7 +635,13 @@ public class Creature {
 
     public void calculateFitness(){
         //add total movement here when it's calculated
-        fitness = (TIME_LIVED / 1000) + (this.getNumChildren() * 30)+(totalFoodEaten/(Utils.FOOD_LIMIT/2)) + (totalMovement*100);
+        //if(TIME_LIVED > LIFE_SPAN * 4){
+           // fitness = (TIME_LIVED / 500) + (this.getNumChildren() * 10)+(totalFoodEaten/(Utils.FOOD_LIMIT/2)) + (totalMovement*200) + (((float)generation)/5);
+       // }else{
+           // fitness = (TIME_LIVED / 1000) + (this.getNumChildren() * 2)+(totalFoodEaten/(Utils.FOOD_LIMIT/2)) + (totalMovement*100)+ (((float)generation)/5);
+       // }
+        fitness = (TIME_LIVED / 1000) + (this.getNumChildren() * 2);// + (((float)generation)/5);
+
     }
 
     public float getFitness(){
