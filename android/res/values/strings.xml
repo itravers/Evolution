@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">Evolution</string>
+    <string name="interstitial1_ad_unit_id">ca-app-pub-5553172650479270/7755408742</string>
+
 
 </resources>

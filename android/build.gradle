@@ -15,8 +15,8 @@ android {
         instrumentTest.setRoot('tests')
     }
     defaultConfig {
-        applicationId "com.mygdx.game"
-        minSdkVersion 8
+        applicationId "com.Evolution_Isaac.game"
+        minSdkVersion 9
         targetSdkVersion 24
     }
 }

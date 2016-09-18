@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1087697801018",
+    "firebase_url": "https://admob-app-id-6278675547.firebaseio.com",
+    "project_id": "admob-app-id-6278675547",
+    "storage_bucket": "admob-app-id-6278675547.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087697801018:android:e9293842cca51c81",
+        "android_client_info": {
+          "package_name": "com.Evolution_Isaac.game"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1087697801018-4gig67jhri2rt58inubntbig9si8udn9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-kk89fYATbiZ2KCdJdv-BwGLiWwm-Fzo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

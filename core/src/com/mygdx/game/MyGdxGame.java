@@ -24,6 +24,9 @@ import com.mygdx.game.NeuralNetwork.Utils;
 
 import java.util.ArrayList;
 
+/**
+ * http://www.norakomi.com/tutorial_admob_part2_banner_ads1.php
+ */
 public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	World physicsWorld;
 
@@ -53,7 +56,17 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 	int MINIMUM_POPULATION = Utils.MINIMUM_POPULATION; //When population is less than this, a new creature is auto bred.
 	int MAXIMUM_POPULATION = Utils.MAXIMUM_POPULATION; //when population exceeds this, a lesser fit creature is killed.
-	
+
+	private AdsController adsController;
+
+	public MyGdxGame(AdsController adsController){
+		if(adsController != null){
+			this.adsController = adsController;
+		}else{
+			this.adsController = new DummyAdsController();
+		}
+	}
+
 	@Override
 	public void create () {
 
@@ -72,6 +85,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 		createFood(Utils.START_FOOD);
 		createCreatures(MINIMUM_POPULATION *Utils.START_POPULATION_MULTIPLIER, 0); //generation 0
+
+		if(adsController.isWifiConnected()) adsController.showBannerAd();
+
 	}
 
 	private void createFood(int num){
@@ -133,6 +149,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		camera.update();
 		updateCreatures();
 		updateFood();
+		int test =0;
 
 
 		float fps = Utils.FPS;
@@ -160,6 +177,19 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		batch.end();
 
 		debugRenderer.render(physicsWorld, debugMatrix);
+
+		if (adsController.isWifiConnected()) {
+			adsController.showInterstitialAd(new Runnable() {
+				@Override
+				public void run() {
+					System.out.println("Interstitial app closed");
+					//Gdx.app.exit();
+
+				}
+			});
+		} else {
+			System.out.println("Interstitial ad not (yet) loaded");
+		}
 	}
 
 	private void updateCreatures(){
