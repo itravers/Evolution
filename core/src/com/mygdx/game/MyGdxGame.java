@@ -179,6 +179,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		debugRenderer.render(physicsWorld, debugMatrix);
 
 		if (adsController.isWifiConnected()) {
+
 			adsController.showInterstitialAd(new Runnable() {
 				@Override
 				public void run() {

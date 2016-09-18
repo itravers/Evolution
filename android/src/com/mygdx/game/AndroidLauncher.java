@@ -116,8 +116,6 @@ public class AndroidLauncher extends AndroidApplication implements AdsController
 					}
 				});
 
-
-
 			}
 		});
 	}
@@ -141,7 +139,7 @@ public class AndroidLauncher extends AndroidApplication implements AdsController
 					interstitialAd.setAdListener(new AdListener() {
 						@Override
 						public void onAdClosed() {
-							Gdx.app.postRunnable(then);
+							//Gdx.app.postRunnable(then);
 							AdRequest.Builder builder = new AdRequest.Builder();
 							builder.addTestDevice("752B44EB5165C7A81E9423963C07AC77");
 							AdRequest ad = builder.build();
